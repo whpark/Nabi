@@ -105,7 +105,7 @@ public:
 		}
 	};
 	std::string m_strCookie;
-	std::function<bool(bool bStore, std::string cookie, S_OPTION&)> m_fnSyncSetting;
+	std::function<bool(bool bStore, std::string_view cookie, S_OPTION&)> m_fnSyncSetting;
 
 	struct S_SCROLL_GEOMETRY {
 		xRect2i rectClient, rectImageScreen, rectScrollRange;

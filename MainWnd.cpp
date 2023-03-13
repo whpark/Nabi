@@ -16,7 +16,7 @@ xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 		base_t::m_dir->SetPath(path.wstring());
 	}
 
-	m_view->m_fnSyncSetting = [this](bool bStore, std::string cookie, xMatView::S_OPTION& option) -> bool {
+	m_view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
 		auto& app = wxGetApp();
 		std::filesystem::path path = app.m_paths.GetConfigDir().ToStdWstring();
 		path /= u8"MatView.json";
