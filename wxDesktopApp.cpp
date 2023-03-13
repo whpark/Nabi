@@ -16,6 +16,10 @@ bool wxDesktopApp::OnInit() {
 	if (!base_t::OnInit())
 		return false;
 
+	std::filesystem::create_directories(m_paths.GetConfigDir().ToStdWstring());
+
+	m_pathSettings = m_paths.GetConfigDir().ToStdWstring();
+	m_pathSettings /= u8"Settings.json";
 	LoadSettings();
 
 	m_wndMain = std::make_unique<xMainWnd>(nullptr);
@@ -24,6 +28,8 @@ bool wxDesktopApp::OnInit() {
 #ifdef _DEBUG
 	m_wndLog = std::make_unique<wxLogWindow>(m_wndMain.get(), wxString(L"Log"));
 	m_wndLog->Show(true);
+#else
+	wxLog::EnableLogging(false);
 #endif
 	return true;
 }

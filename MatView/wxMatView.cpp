@@ -70,7 +70,7 @@ IMatView::IMatView( wxWindow* parent, wxWindowID id, const wxPoint& pos, const w
 	this->Connect( m_toolZoomIn->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnZoomIn ) );
 	this->Connect( m_toolZoomOut->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnZoomOut ) );
 	this->Connect( m_toolZoomReset->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnZoomFit ) );
-	this->Connect( m_toolSettings->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnSetings ) );
+	this->Connect( m_toolSettings->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnSettings ) );
 	m_view->Connect( wxEVT_CHAR_HOOK, wxKeyEventHandler( IMatView::OnCharHook_View ), NULL, this );
 	m_view->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( IMatView::OnLeftDown_View ), NULL, this );
 	m_view->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( IMatView::OnLeftUp_View ), NULL, this );
@@ -96,7 +96,7 @@ IMatView::~IMatView()
 	this->Disconnect( m_toolZoomIn->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnZoomIn ) );
 	this->Disconnect( m_toolZoomOut->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnZoomOut ) );
 	this->Disconnect( m_toolZoomReset->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnZoomFit ) );
-	this->Disconnect( m_toolSettings->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnSetings ) );
+	this->Disconnect( m_toolSettings->GetId(), wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler( IMatView::OnSettings ) );
 	m_view->Disconnect( wxEVT_CHAR_HOOK, wxKeyEventHandler( IMatView::OnCharHook_View ), NULL, this );
 	m_view->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( IMatView::OnLeftDown_View ), NULL, this );
 	m_view->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( IMatView::OnLeftUp_View ), NULL, this );

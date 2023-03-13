@@ -251,6 +251,10 @@ static double const dZoomLevels[] = {
 xMatView::xMatView( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) noexcept
  : ui::IMatView(parent, id, pos, size, style, name)
 {
+	if (m_fnSyncSetting) {
+		m_fnSyncSetting(false, m_strCookie, m_option);
+	}
+
 	m_context = std::make_unique<wxGLContext>(m_view);
 	m_view->SetCurrent(*m_context);
 	//glewExperimental = true;
@@ -440,7 +444,7 @@ void xMatView::ClearSelectionRect() {
 	m_mouse.bRectSelected = false;
 }
 
-void xMatView::SetOption(S_OPTION const& option) {
+bool xMatView::SetOption(S_OPTION const& option, bool bStore) {
 	if (&m_option != &option)
 		m_option = option;
 
@@ -448,6 +452,11 @@ void xMatView::SetOption(S_OPTION const& option) {
 	UpdateScrollBars();
 	m_view->Refresh(false);
 	m_view->Update();
+
+	if (bStore) {
+		return m_fnSyncSetting and m_fnSyncSetting(true, m_strCookie, m_option);
+	}
+	return true;
 }
 
 bool xMatView::ShowToolBar(bool bShow) {
@@ -978,7 +987,7 @@ void xMatView::OnZoomFit(wxCommandEvent& event) {
 	m_view->Update();
 }
 
-void xMatView::OnSetings(wxCommandEvent& event) {
+void xMatView::OnSettings(wxCommandEvent& event) {
 	xDlgMatViewOption dlg(m_option, this);
 	if (dlg.ShowModal() != wxStandardID::wxID_OK)
 		return;

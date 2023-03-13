@@ -358,7 +358,7 @@
                             <property name="permission">protected</property>
                             <property name="statusbar"></property>
                             <property name="tooltip"></property>
-                            <event name="OnToolClicked">OnSetings</event>
+                            <event name="OnToolClicked">OnSettings</event>
                         </object>
                         <object class="wxTextCtrl" expanded="1">
                             <property name="BottomDockable">1</property>

@@ -59,7 +59,53 @@ public:
 		eZOOM_IN eZoomIn{eZOOM_IN::nearest};
 		eZOOM_OUT eZoomOut{eZOOM_OUT::area};
 		cv::Vec3b crBackground{161, 114, 230};	// rgb
+
+		// Sync with json
+		template < typename json_t >
+		void FromJson(json_t const& j) {
+		#if defined(SK_GL)
+			bGLonly = j.value("bGLonly", bGLonly);
+			bSkia = j.value("bSkia", bSkia);
+		#endif
+			bZoomLock = j.value("bZoomLock", bZoomLock);
+			bPanningLock = j.value("bPanningLock", bPanningLock);
+			bExtendedPanning = j.value("bExtendedPanning", bExtendedPanning);
+			bKeyboardNavigation = j.value("bKeyboardNavigation", bKeyboardNavigation);
+			bDrawPixelValue = j.value("bDrawPixelValue", bDrawPixelValue);
+			bPyrImageDown = j.value("bPyrImageDown", bPyrImageDown);
+			dMouseSpeed = j.value("dMouseSpeed", dMouseSpeed);
+			nScrollMargin = j.value("nScrollMargin", nScrollMargin);
+			tsScroll = std::chrono::milliseconds(j.value("tsScroll", tsScroll.count()));
+			eZoomIn = (eZOOM_IN)j.value("eZoomIn", std::to_underlying(eZoomIn));
+			eZoomOut = (eZOOM_OUT)j.value("eZoomOut", std::to_underlying(eZoomOut));
+			crBackground[0] = j.value("crBackgroundR", crBackground[0]);
+			crBackground[1] = j.value("crBackgroundG", crBackground[1]);
+			crBackground[2] = j.value("crBackgroundB", crBackground[2]);
+		}
+		template < typename json_t >
+		void ToJson(json_t& j) const {
+		#if defined(SK_GL)
+			j["bGLonly"] = bGLonly;
+			j["bSkia"] = bSkia;
+		#endif
+			j["bZoomLock"] = bZoomLock;
+			j["bPanningLock"] = bPanningLock;
+			j["bExtendedPanning"] = bExtendedPanning;
+			j["bKeyboardNavigation"] = bKeyboardNavigation;
+			j["bDrawPixelValue"] = bDrawPixelValue;
+			j["bPyrImageDown"] = bPyrImageDown;
+			j["dMouseSpeed"] = dMouseSpeed;
+			j["nScrollMargin"] = nScrollMargin;
+			j["tsScroll"] = tsScroll.count();
+			j["eZoomIn"] = std::to_underlying(eZoomIn);
+			j["eZoomOut"] = std::to_underlying(eZoomOut);
+			j["crBackgroundR"] = crBackground[0];
+			j["crBackgroundG"] = crBackground[1];
+			j["crBackgroundB"] = crBackground[2];
+		}
 	};
+	std::string m_strCookie;
+	std::function<bool(bool bStore, std::string cookie, S_OPTION&)> m_fnSyncSetting;
 
 	struct S_SCROLL_GEOMETRY {
 		xRect2i rectClient, rectImageScreen, rectScrollRange;
@@ -124,8 +170,10 @@ public:
 	void SetSelectionRect(xRect2i const& rect);
 	void ClearSelectionRect();
 
+	bool LoadOption() { return m_fnSyncSetting and m_fnSyncSetting(false, m_strCookie, m_option) and SetOption(m_option, false); }
+	bool SaveOption() { return m_fnSyncSetting and m_fnSyncSetting(true, m_strCookie, m_option); }
 	S_OPTION const& GetOption() const { return m_option; }
-	void SetOption(S_OPTION const& option);
+	bool SetOption(S_OPTION const& option, bool bStore = true);
 
 	bool ShowToolBar(bool bShow);
 	bool IsToolBarShown() const { m_toolBar->IsShown(); }
@@ -156,7 +204,7 @@ protected:
 	virtual void OnZoomIn( wxCommandEvent& event ) override;
 	virtual void OnZoomOut( wxCommandEvent& event ) override;
 	virtual void OnZoomFit( wxCommandEvent& event ) override;
-	virtual void OnSetings( wxCommandEvent& event ) override;
+	virtual void OnSettings( wxCommandEvent& event ) override;
 	virtual void OnCharHook_View( wxKeyEvent& event ) override { event.Skip();/*OnKeyEvent(event);*/ }
 	virtual void OnLeftDown_View( wxMouseEvent& event ) override;
 	virtual void OnLeftUp_View( wxMouseEvent& event ) override;

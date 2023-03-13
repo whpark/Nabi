@@ -70,7 +70,7 @@ namespace ui
 			virtual void OnZoomIn( wxCommandEvent& event ) = 0;
 			virtual void OnZoomOut( wxCommandEvent& event ) = 0;
 			virtual void OnZoomFit( wxCommandEvent& event ) = 0;
-			virtual void OnSetings( wxCommandEvent& event ) = 0;
+			virtual void OnSettings( wxCommandEvent& event ) = 0;
 			virtual void OnCharHook_View( wxKeyEvent& event ) = 0;
 			virtual void OnLeftDown_View( wxMouseEvent& event ) = 0;
 			virtual void OnLeftUp_View( wxMouseEvent& event ) = 0;
