@@ -101,7 +101,7 @@ bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, g
 	// Draw Grid / pixel value
 	if (ctCanvasFromImage.m_scale < 4)
 		return false;
-	cv::Scalar cr{0, 0, 0};
+	cv::Scalar cr{255, 255, 255};
 	// grid - horizontal
 	for (int y{roi.y}, y1{roi.y+roi.height}; y < y1; y++) {
 		auto pt0 = ctCanvasFromImage(xPoint2d{roi.x, y});

@@ -11,7 +11,7 @@ public:
 public:
     wxStandardPaths m_paths{wxStandardPaths::Get()};
     stdfs::path m_pathSettings;
-    wxRegKey m_reg{wxRegKey::HKCU, L"Software\\wxDesktopApp"};
+    wxRegKey m_reg{wxRegKey::HKCU, L"Software\\Biscuit-lab\\Nabi"};
 
     std::unique_ptr<xMainWnd> m_wndMain;
 #ifdef _DEBUG
