@@ -101,7 +101,7 @@ bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, g
 	// Draw Grid / pixel value
 	if (ctCanvasFromImage.m_scale < 4)
 		return false;
-	cv::Scalar cr{255, 255, 255};
+	cv::Scalar cr{127, 127, 127};
 	// grid - horizontal
 	for (int y{roi.y}, y1{roi.y+roi.height}; y < y1; y++) {
 		auto pt0 = ctCanvasFromImage(xPoint2d{roi.x, y});
@@ -332,6 +332,8 @@ xMatView::~xMatView() {
 	m_skTypeface.reset();
 	m_skContext.reset();
 #endif
+
+	m_cmbZoomMode->SetSelection(std::to_underlying(m_eZoom));
 
 	m_view->Disconnect(wxEVT_SCROLLWIN_TOP,				wxScrollWinEventHandler(xMatView::OnScrollWin_View), nullptr, this );
 	m_view->Disconnect(wxEVT_SCROLLWIN_BOTTOM,			wxScrollWinEventHandler(xMatView::OnScrollWin_View), nullptr, this );

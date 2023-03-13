@@ -97,7 +97,7 @@ protected:
 	} m_smooth_scroll;
 
 	S_OPTION m_option;
-	eZOOM m_eZoom{eZOOM::one2one};
+	eZOOM m_eZoom{eZOOM::fit2window};
 	xCoordTrans m_ctScreenFromImage;
 
 public:
