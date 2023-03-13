@@ -23,6 +23,7 @@ class wxGLCanvasAdapter;
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
+#include <wx/textctrl.h>
 #include <wx/toolbar.h>
 #include <wx/panel.h>
 #include <wx/sizer.h>
@@ -55,6 +56,7 @@ namespace ui
 			wxToolBarToolBase* m_toolZoomOut;
 			wxToolBarToolBase* m_toolZoomReset;
 			wxToolBarToolBase* m_toolSettings;
+			wxTextCtrl* m_textStatus;
 			wxGLCanvasAdapter* m_view;
 			wxTimer m_timerScroll;
 
@@ -83,7 +85,7 @@ namespace ui
 
 		public:
 
-			IMatView( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 424,135 ), long style = wxALWAYS_SHOW_SB|wxTAB_TRAVERSAL|wxWANTS_CHARS, const wxString& name = wxEmptyString );
+			IMatView( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 652,140 ), long style = wxALWAYS_SHOW_SB|wxTAB_TRAVERSAL|wxWANTS_CHARS, const wxString& name = wxEmptyString );
 
 			~IMatView();
 

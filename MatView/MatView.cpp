@@ -1243,6 +1243,12 @@ void xMatView::OnMotion_View( wxMouseEvent& event ) {
 		m_view->Refresh(false);
 		m_view->Update();
 	}
+
+	// Mouse Posittion
+	{
+		auto ptImage = m_ctScreenFromImage.TransI(pt);
+		m_textStatus->SetValue(std::format(L"{},{}", ptImage.x, ptImage.y).c_str());
+	}
 }
 
 void xMatView::OnMouseWheel_View( wxMouseEvent& event ) {
