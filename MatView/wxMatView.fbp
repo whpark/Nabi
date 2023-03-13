@@ -405,7 +405,7 @@
                             <property name="pos"></property>
                             <property name="resize">Resizable</property>
                             <property name="show">1</property>
-                            <property name="size">150,-1</property>
+                            <property name="size">200,-1</property>
                             <property name="style">wxTE_READONLY</property>
                             <property name="subclass">; ; forward_declare</property>
                             <property name="toolbar_pane">0</property>

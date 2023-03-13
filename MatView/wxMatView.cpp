@@ -47,7 +47,7 @@ IMatView::IMatView( wxWindow* parent, wxWindowID id, const wxPoint& pos, const w
 
 	m_toolSettings = m_toolBar->AddTool( wxID_ANY, _("tool"), wxArtProvider::GetBitmap( wxART_LIST_VIEW, wxART_TOOLBAR ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL );
 
-	m_textStatus = new wxTextCtrl( m_toolBar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 150,-1 ), wxTE_READONLY );
+	m_textStatus = new wxTextCtrl( m_toolBar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 200,-1 ), wxTE_READONLY );
 	m_toolBar->AddControl( m_textStatus );
 	m_toolBar->Realize();
 
