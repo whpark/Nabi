@@ -7,7 +7,7 @@
 
 #include "pch.h"
 
-#include "MatView/MatView.h"
+#include "gtl/wx/MatView.h"
 
 #include "wxUI.h"
 
@@ -51,7 +51,7 @@ IMainWnd::IMainWnd( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	m_panelFolder->SetSizer( sbSizer2 );
 	m_panelFolder->Layout();
 	sbSizer2->Fit( m_panelFolder );
-	m_view = new xMatView( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_view = new gtl::wx::xMatView( m_splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_splitter->SplitVertically( m_panelFolder, m_view, 0 );
 	bSizerTop->Add( m_splitter, 1, wxEXPAND, 5 );
 

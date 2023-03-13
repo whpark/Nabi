@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="MatView">
-      <UniqueIdentifier>{35928102-d7dc-4b78-a8a5-33aa32289ad2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -34,18 +31,6 @@
     </ClInclude>
     <ClInclude Include="MainWnd.h">
       <Filter>Framework - wxWidgets</Filter>
-    </ClInclude>
-    <ClInclude Include="MatView\DlgMatViewOption.h">
-      <Filter>MatView</Filter>
-    </ClInclude>
-    <ClInclude Include="MatView\MatView.h">
-      <Filter>MatView</Filter>
-    </ClInclude>
-    <ClInclude Include="MatView\wxGLCanvasAdapter.h">
-      <Filter>MatView</Filter>
-    </ClInclude>
-    <ClInclude Include="MatView\wxMatView.h">
-      <Filter>MatView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -74,25 +59,10 @@
     <ClCompile Include="MainWnd.cpp">
       <Filter>Framework - wxWidgets</Filter>
     </ClCompile>
-    <ClCompile Include="MatView\DlgMatViewOption.cpp">
-      <Filter>MatView</Filter>
-    </ClCompile>
-    <ClCompile Include="MatView\MatView.cpp">
-      <Filter>MatView</Filter>
-    </ClCompile>
-    <ClCompile Include="MatView\wxGLCanvasAdapter.cpp">
-      <Filter>MatView</Filter>
-    </ClCompile>
-    <ClCompile Include="MatView\wxMatView.cpp">
-      <Filter>MatView</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="wxUI.fbp">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="MatView\wxMatView.fbp">
-      <Filter>MatView</Filter>
     </None>
   </ItemGroup>
 </Project>

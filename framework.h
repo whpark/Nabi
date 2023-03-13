@@ -25,6 +25,7 @@
 
 #include "gtl/gtl.h"
 #include "gtl/json_proxy.h"
+#include "gtl/wx/MatView.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/stopwatch.h"

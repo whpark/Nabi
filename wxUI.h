@@ -10,7 +10,7 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-class xMatView;
+namespace gtl{ namespace wx{ class xMatView; } }
 
 #include <wx/string.h>
 #include <wx/filepicker.h>
@@ -46,7 +46,7 @@ namespace ui
 			wxDirPickerCtrl* m_dirPicker;
 			wxButton* m_btnGo;
 			wxGenericDirCtrl* m_dir;
-			xMatView* m_view;
+			gtl::wx::xMatView* m_view;
 
 			// Virtual event handlers, override them in your derived class
 			virtual void OnButtonClick_Go( wxCommandEvent& event ) = 0;

@@ -1,9 +1,7 @@
 ﻿#include "pch.h"
-#include"wxDesktopApp.h"
+#include "wxDesktopApp.h"
 #include "MainWnd.h"
-#include "MatView/MatView.h"
-
-#include "opencv2/cudaimgproc.hpp"
+#include "gtl/wx/MatView.h"
 
 xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 	auto& app = wxGetApp();
@@ -16,7 +14,7 @@ xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 		base_t::m_dir->SetPath(path.wstring());
 	}
 
-	m_view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
+	m_view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, gtl::wx::xMatView::S_OPTION& option) -> bool {
 		auto& app = wxGetApp();
 		std::filesystem::path path = app.m_paths.GetConfigDir().ToStdWstring();
 		path /= u8"MatView.json";

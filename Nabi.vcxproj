@@ -105,6 +105,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreLinkEvent>
+      <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
+xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -131,6 +135,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreLinkEvent>
+      <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
+xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -153,6 +161,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreLinkEvent>
+      <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
+xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -179,14 +191,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreLinkEvent>
+      <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
+xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainWnd.h" />
-    <ClInclude Include="MatView\DlgMatViewOption.h" />
-    <ClInclude Include="MatView\MatView.h" />
-    <ClInclude Include="MatView\wxGLCanvasAdapter.h" />
-    <ClInclude Include="MatView\wxMatView.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -195,10 +207,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainWnd.cpp" />
-    <ClCompile Include="MatView\DlgMatViewOption.cpp" />
-    <ClCompile Include="MatView\MatView.cpp" />
-    <ClCompile Include="MatView\wxGLCanvasAdapter.cpp" />
-    <ClCompile Include="MatView\wxMatView.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -216,7 +224,6 @@
     <Image Include="wxDesktopApp.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MatView\wxMatView.fbp" />
     <None Include="wxUI.fbp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
