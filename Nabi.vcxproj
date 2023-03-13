@@ -105,10 +105,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <PreLinkEvent>
+    <PreLinkEvent />
+    <PreBuildEvent>
       <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
 xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
-    </PreLinkEvent>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -135,10 +136,11 @@ xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(Ta
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <PreLinkEvent>
+    <PreLinkEvent />
+    <PreBuildEvent>
       <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
 xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
-    </PreLinkEvent>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -161,10 +163,11 @@ xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(Ta
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <PreLinkEvent>
+    <PreLinkEvent />
+    <PreBuildEvent>
       <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
 xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
-    </PreLinkEvent>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -191,10 +194,11 @@ xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(Ta
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\;$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <PreLinkEvent>
+    <PreLinkEvent />
+    <PreBuildEvent>
       <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
 xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
-    </PreLinkEvent>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
