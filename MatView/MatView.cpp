@@ -1238,17 +1238,29 @@ void xMatView::OnMotion_View( wxMouseEvent& event ) {
 		UpdateScrollBars();
 		m_view->Refresh(false);
 	}
+
+	// Selection Mode
 	if (m_mouse.bInSelectionMode) {
-		m_mouse.ptSel1 = m_ctScreenFromImage.TransI(event.GetPosition());
+		auto pt = m_ctScreenFromImage.TransI(event.GetPosition());
+		m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
+		m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
 		m_view->Refresh(false);
 		m_view->Update();
 	}
 
-	// Mouse Posittion
+	// status
 	{
 		auto ptImage = m_ctScreenFromImage.TransI(pt);
-		m_textStatus->SetValue(std::format(L"{},{}", ptImage.x, ptImage.y).c_str());
+		auto status = std::format(L"{},{}", ptImage.x, ptImage.y);
+		if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
+			gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
+			status += std::format(L" w{}, h{}", size.cx, size.cy);
+		}
+		//if (status != m_textStatus->GetValue().ToStdWstring()) {
+			m_textStatus->SetValue(status);
+		//}
 	}
+
 }
 
 void xMatView::OnMouseWheel_View( wxMouseEvent& event ) {
@@ -1263,11 +1275,16 @@ void xMatView::OnRightDown_View( wxMouseEvent& event ) {
 	if (m_mouse.bInSelectionMode) {
 		m_mouse.bInSelectionMode = false;
 		m_mouse.bRectSelected = true;
-		m_mouse.ptSel1 = m_ctScreenFromImage.TransI(event.GetPosition());
+		auto pt = m_ctScreenFromImage.TransI(event.GetPosition());
+		m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
+		m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
 	} else {
 		m_mouse.bRectSelected = false;
 		m_mouse.bInSelectionMode = true;
-		m_mouse.ptSel0 = m_mouse.ptSel1 = m_ctScreenFromImage.TransI(event.GetPosition());
+		auto pt = m_mouse.ptSel1 = m_ctScreenFromImage.TransI(event.GetPosition());
+		m_mouse.ptSel0.x = std::clamp<int>(pt.x, 0, m_img.cols);
+		m_mouse.ptSel0.y = std::clamp<int>(pt.y, 0, m_img.rows);
+
 	}
 	m_view->Refresh(false);
 	m_view->Update();
