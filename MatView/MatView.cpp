@@ -101,7 +101,7 @@ bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, g
 	// Draw Grid / pixel value
 	if (ctCanvasFromImage.m_scale < 4)
 		return false;
-	cv::Scalar cr{127, 127, 127};
+	cv::Scalar cr{127, 127, 127, 255};
 	// grid - horizontal
 	for (int y{roi.y}, y1{roi.y+roi.height}; y < y1; y++) {
 		auto pt0 = ctCanvasFromImage(xPoint2d{roi.x, y});
@@ -134,7 +134,7 @@ bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, g
 			auto& org = imgOriginal;
 			auto v = GetMatValue(ptr, depth, nChannel, y, x);
 			auto avg = (v[0] + v[1] + v[2]) / nChannel;
-			auto cr = (avg > 128) ? cv::Scalar{0, 0, 0} : cv::Scalar{255, 255, 255};
+			auto cr = (avg > 128) ? cv::Scalar{0, 0, 0, 255} : cv::Scalar{255, 255, 255, 255};
 			for (int ch{}; ch < nChannel; ch++) {
 				auto str = fmt::format("{:3}", v[ch]);
 				cv::putText(canvas, str, cv::Point(pt.x, pt.y+(ch+1)*minHeight*heightFont*5), 0, heightFont, cr, 1, true);

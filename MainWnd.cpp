@@ -3,6 +3,8 @@
 #include "MainWnd.h"
 #include "MatView/MatView.h"
 
+#include "opencv2/cudaimgproc.hpp"
+
 xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 	wxString str;
 	wxGetApp().m_reg.QueryValue(L"LastImage", str);
@@ -28,6 +30,11 @@ void xMainWnd::OnDirctrlSelectionChanged(wxCommandEvent& event) {
 	auto img = gtl::LoadImageMat(path);
 	if (img.empty())
 		return;
+	if (img.channels() == 3) {
+		cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGR2RGB);
+	} else if (img.channels() == 4) {
+		cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGRA2RGBA);
+	}
 	wxGetApp().m_reg.SetValue(L"LastImage", path.wstring());
 	base_t::m_view->SetImage(img);
 }
