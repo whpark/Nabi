@@ -127,6 +127,9 @@ public:
 	S_OPTION const& GetOption() const { return m_option; }
 	void SetOption(S_OPTION const& option);
 
+	bool ShowToolBar(bool bShow);
+	bool IsToolBarShown() const { m_toolBar->IsShown(); }
+
 	//virtual void OnClose(wxCloseEvent& event) override;
 
 	// ClientRect, ImageRect, ScrollRange
@@ -145,6 +148,7 @@ protected:
 
 protected:
 	virtual void OnCharHook( wxKeyEvent& event ) override;
+	virtual void OnButtonClick_Hide( wxCommandEvent& event ) override;
 	virtual void OnCombobox_ZoomMode( wxCommandEvent& event ) override;
 	void OnSpinCtrl(double scale);
 	virtual void OnSpinCtrlDouble_ZoomValue( wxSpinDoubleEvent& event ) override;

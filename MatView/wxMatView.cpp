@@ -16,13 +16,13 @@ using namespace ui;
 
 IMatView::IMatView( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
-	wxBoxSizer* bSizer;
-	bSizer = new wxBoxSizer( wxVERTICAL );
+	m_sizerTop = new wxBoxSizer( wxVERTICAL );
 
 	m_toolBar = new wxToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL );
-	m_checkBoxShow = new wxCheckBox( m_toolBar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxShow->SetValue(true);
-	m_toolBar->AddControl( m_checkBoxShow );
+	m_btnHide = new wxButton( m_toolBar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 20,-1 ), 0 );
+
+	m_btnHide->SetBitmap( wxArtProvider::GetBitmap( wxART_CLOSE, wxART_TOOLBAR ) );
+	m_toolBar->AddControl( m_btnHide );
 	m_toolBar->AddSeparator();
 
 	m_cmbZoomMode = new wxComboBox( m_toolBar, wxID_ANY, _("fit2window"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
@@ -51,18 +51,19 @@ IMatView::IMatView( wxWindow* parent, wxWindowID id, const wxPoint& pos, const w
 	m_toolBar->AddControl( m_textStatus );
 	m_toolBar->Realize();
 
-	bSizer->Add( m_toolBar, 0, wxEXPAND|wxRIGHT|wxLEFT, 0 );
+	m_sizerTop->Add( m_toolBar, 0, wxEXPAND|wxRIGHT|wxLEFT, 0 );
 
 	m_view = new wxGLCanvasAdapter( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL );
-	bSizer->Add( m_view, 1, wxEXPAND, 5 );
+	m_sizerTop->Add( m_view, 1, wxEXPAND, 5 );
 
 
-	this->SetSizer( bSizer );
+	this->SetSizer( m_sizerTop );
 	this->Layout();
 	m_timerScroll.SetOwner( this, wxID_SCROLL );
 
 	// Connect Events
 	this->Connect( wxEVT_CHAR_HOOK, wxKeyEventHandler( IMatView::OnCharHook ) );
+	m_btnHide->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( IMatView::OnButtonClick_Hide ), NULL, this );
 	m_cmbZoomMode->Connect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( IMatView::OnCombobox_ZoomMode ), NULL, this );
 	m_spinCtrlZoom->Connect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxSpinDoubleEventHandler( IMatView::OnSpinCtrlDouble_ZoomValue ), NULL, this );
 	m_spinCtrlZoom->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( IMatView::OnTextEnter_ZoomValue ), NULL, this );
@@ -88,6 +89,7 @@ IMatView::~IMatView()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CHAR_HOOK, wxKeyEventHandler( IMatView::OnCharHook ) );
+	m_btnHide->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( IMatView::OnButtonClick_Hide ), NULL, this );
 	m_cmbZoomMode->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( IMatView::OnCombobox_ZoomMode ), NULL, this );
 	m_spinCtrlZoom->Disconnect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxSpinDoubleEventHandler( IMatView::OnSpinCtrlDouble_ZoomValue ), NULL, this );
 	m_spinCtrlZoom->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( IMatView::OnTextEnter_ZoomValue ), NULL, this );

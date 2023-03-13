@@ -12,26 +12,26 @@
 #include <wx/intl.h>
 class wxGLCanvasAdapter;
 
+#include <wx/button.h>
 #include <wx/string.h>
-#include <wx/checkbox.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/combobox.h>
 #include <wx/spinctrl.h>
-#include <wx/bitmap.h>
-#include <wx/image.h>
-#include <wx/icon.h>
 #include <wx/textctrl.h>
 #include <wx/toolbar.h>
 #include <wx/panel.h>
 #include <wx/sizer.h>
 #include <wx/timer.h>
+#include <wx/checkbox.h>
 #include <wx/stattext.h>
 #include <wx/radiobox.h>
 #include <wx/clrpicker.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -48,8 +48,9 @@ namespace ui
 		private:
 
 		protected:
+			wxBoxSizer* m_sizerTop;
 			wxToolBar* m_toolBar;
-			wxCheckBox* m_checkBoxShow;
+			wxButton* m_btnHide;
 			wxComboBox* m_cmbZoomMode;
 			wxSpinCtrlDouble* m_spinCtrlZoom;
 			wxToolBarToolBase* m_toolZoomIn;
@@ -62,6 +63,7 @@ namespace ui
 
 			// Virtual event handlers, override them in your derived class
 			virtual void OnCharHook( wxKeyEvent& event ) = 0;
+			virtual void OnButtonClick_Hide( wxCommandEvent& event ) = 0;
 			virtual void OnCombobox_ZoomMode( wxCommandEvent& event ) = 0;
 			virtual void OnSpinCtrlDouble_ZoomValue( wxSpinDoubleEvent& event ) = 0;
 			virtual void OnTextEnter_ZoomValue( wxCommandEvent& event ) = 0;

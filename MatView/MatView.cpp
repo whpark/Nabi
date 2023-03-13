@@ -450,6 +450,16 @@ void xMatView::SetOption(S_OPTION const& option) {
 	m_view->Update();
 }
 
+bool xMatView::ShowToolBar(bool bShow) {
+	if (!m_toolBar)
+		return false;
+	m_toolBar->Show(bShow);
+	m_sizerTop->Layout();
+	Layout();
+	return true;
+}
+
+
 bool xMatView::UpdateCT(bool bCenter, eZOOM eZoom) {
 	if (m_img.empty())
 		return false;
@@ -865,8 +875,12 @@ bool xMatView::OnKeyEvent(wxKeyEvent& event) {
 	//// Print Char Pressed
 	//auto l = std::source_location::current();
 	//OutputDebugString(std::format(L"{}: {}\n", gtl::ToStringW(l.function_name()), event.GetKeyCode()).c_str());
+	auto bControl = wxGetKeyState(WXK_CONTROL);
+	auto bAlt = wxGetKeyState(WXK_ALT);
+	auto bShift = wxGetKeyState(WXK_SHIFT);
+	auto code = event.GetKeyCode();
 
-	if ( (event.GetKeyCode() == WXK_ESCAPE)
+	if ( (code == WXK_ESCAPE)
 		and (m_mouse.bRectSelected or m_mouse.bInSelectionMode)
 		)
 	{
@@ -876,8 +890,14 @@ bool xMatView::OnKeyEvent(wxKeyEvent& event) {
 		return true;
 	}
 
+	if ( bControl and bAlt and !bShift and (code == 'M') ) {
+		auto show = !m_toolBar->IsShown();
+		ShowToolBar(show);
+		return true;
+	}
+
 	if (m_option.bKeyboardNavigation
-		and KeyboardNavigate(event.GetKeyCode(), wxGetKeyState(WXK_CONTROL), wxGetKeyState(WXK_ALT), wxGetKeyState(WXK_SHIFT)))
+		and KeyboardNavigate(event.GetKeyCode(), bControl, bAlt, bShift))
 	{
 		return true;
 	}
@@ -888,6 +908,10 @@ bool xMatView::OnKeyEvent(wxKeyEvent& event) {
 
 void xMatView::OnCharHook(wxKeyEvent& event) {
 	OnKeyEvent(event);
+}
+
+void xMatView::OnButtonClick_Hide(wxCommandEvent& event) {
+	ShowToolBar(false);
 }
 
 void xMatView::OnCombobox_ZoomMode(wxCommandEvent& ) {
@@ -964,6 +988,32 @@ void xMatView::OnSetings(wxCommandEvent& event) {
 void xMatView::OnPaint_View( wxPaintEvent& event ) {
 	using namespace gtl;
 
+	//================
+	// openGL
+	m_view->SetCurrent(*m_context);
+
+	// Client Rect
+	xRect2i rectClient;
+	rectClient = m_view->GetClientRect();
+	xSize2i const size = rectClient.GetSize();
+	glViewport(0, 0, size.cx, size.cy);
+
+	glMatrixMode(GL_PROJECTION);     // Make a simple 2D projection on the entire window
+	glLoadIdentity();
+	glOrtho(0.0, size.cx, size.cy, 0.0, 0.0, 100.0);
+
+	glMatrixMode(GL_MODELVIEW);    // Set the matrix mode to object modeling
+	cv::Scalar cr = m_option.crBackground;
+	glClearColor(cr[0]/255.f, cr[1]/255.f, cr[2]/255.f, 1.0f);
+	glClearDepth(0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the window
+
+	gtl::xFinalAction faSwapBuffer{[&]{
+		//OutputDebugStringA("Flush\n");
+		glFlush();
+		m_view->SwapBuffers();
+	}};
+
 	//event.Skip();
 	if (!m_view or !m_context)
 		return;
@@ -971,12 +1021,8 @@ void xMatView::OnPaint_View( wxPaintEvent& event ) {
 	// Show zoom Scale
 	base_t::m_spinCtrlZoom->SetValue(m_ctScreenFromImage.m_scale);
 
-	// Client Rect
-	xRect2i rectClient;
-	rectClient = m_view->GetClientRect();
 	if (rectClient.IsRectEmpty())
 		return;
-	xSize2i const size = rectClient.GetSize();
 
 	//==================
 	// Get Image - ROI
@@ -1056,28 +1102,6 @@ void xMatView::OnPaint_View( wxPaintEvent& event ) {
 	} catch (...) {
 		OutputDebugStringA("cv::.......\n");
 	}
-
-	//================
-	// openGL
-	m_view->SetCurrent(*m_context);
-
-	glViewport(0, 0, size.cx, size.cy);
-
-	glMatrixMode(GL_PROJECTION);     // Make a simple 2D projection on the entire window
-	glLoadIdentity();
-	glOrtho(0.0, size.cx, size.cy, 0.0, 0.0, 100.0);
-
-	glMatrixMode(GL_MODELVIEW);    // Set the matrix mode to object modeling
-	cv::Scalar cr = m_option.crBackground;
-	glClearColor(cr[0]/255.f, cr[1]/255.f, cr[2]/255.f, 1.0f);
-	glClearDepth(0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the window
-
-	gtl::xFinalAction faSwapBuffer{[&]{
-		//OutputDebugStringA("Flush\n");
-		glFlush();
-		m_view->SwapBuffers();
-	}};
 
 	if (
 		!img.empty()
