@@ -1,9 +1,13 @@
 ﻿#include "pch.h"
 #include "wxDesktopApp.h"
 #include "MainWnd.h"
+#include "util.h"
 #include "gtl/wx/MatView.h"
 
 xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
+	m_bInitialized = true;
+	LoadWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
+
 	auto& app = wxGetApp();
 	wxString str;
 	app.m_reg.QueryValue(L"LastImage", str);
@@ -38,6 +42,20 @@ xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 	m_view->LoadOption();
 }
 
+void xMainWnd::OnMove(wxMoveEvent& event) {
+	if (!m_bInitialized)
+		return;
+	SaveWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
+}
+
+void xMainWnd::OnSize(wxSizeEvent& event) {
+	//event.Skip();
+	wxFrame::OnSize(event);
+	if (!m_bInitialized)
+		return;
+	SaveWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
+}
+
 void xMainWnd::OnButtonClick_Go(wxCommandEvent& event) {
 	auto strPath = base_t::m_dirPicker->GetPath();
 	base_t::m_dir->SetPath(strPath);
@@ -60,3 +78,4 @@ void xMainWnd::OnDirctrlSelectionChanged(wxCommandEvent& event) {
 	wxGetApp().m_reg.SetValue(L"LastImage", path.wstring());
 	base_t::m_view->SetImage(img);
 }
+

@@ -9,6 +9,12 @@ wxIMPLEMENT_APP(wxDesktopApp);
 
 bool wxDesktopApp::OnInit() {
 	m_reg.Create();
+#ifdef _DEBUG
+	m_wndLog = std::make_unique<wxLogWindow>(m_wndMain.get(), wxString(L"Log"));
+	m_wndLog->Show(true);
+#else
+	wxLog::EnableLogging(false);
+#endif
 
 	// Startup Folder
 	gtl::SetCurrentPath_ProjectFolder(stdfs::path(L"."));
@@ -25,12 +31,6 @@ bool wxDesktopApp::OnInit() {
 	m_wndMain = std::make_unique<xMainWnd>(nullptr);
 	m_wndMain->Show();
 
-#ifdef _DEBUG
-	m_wndLog = std::make_unique<wxLogWindow>(m_wndMain.get(), wxString(L"Log"));
-	m_wndLog->Show(true);
-#else
-	wxLog::EnableLogging(false);
-#endif
 	return true;
 }
 

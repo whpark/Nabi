@@ -18,12 +18,18 @@ public:
 	using this_t = xMainWnd;
 	using base_t = ui::IMainWnd;
 
+protected:
+	bool m_bInitialized{};
+
 public:
 	/** Constructor */
 	xMainWnd(wxWindow* parent);
 //// end generated class members
 
 protected:
+	virtual void OnMove( wxMoveEvent& event ) override;
+	virtual void OnSize( wxSizeEvent& event ) override;
+
 	virtual void OnButtonClick_Go( wxCommandEvent& event ) override;
 	virtual void OnDirctrlSelectionChanged( wxCommandEvent& event ) override;
 };

@@ -62,6 +62,8 @@ IMainWnd::IMainWnd( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	this->Centre( wxBOTH );
 
 	// Connect Events
+	this->Connect( wxEVT_MOVE, wxMoveEventHandler( IMainWnd::OnMove ) );
+	this->Connect( wxEVT_SIZE, wxSizeEventHandler( IMainWnd::OnSize ) );
 	m_btnGo->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( IMainWnd::OnButtonClick_Go ), NULL, this );
 	m_dir->Connect( wxEVT_DIRCTRL_SELECTIONCHANGED, wxCommandEventHandler( IMainWnd::OnDirctrlSelectionChanged ), NULL, this );
 }
@@ -69,6 +71,8 @@ IMainWnd::IMainWnd( wxWindow* parent, wxWindowID id, const wxString& title, cons
 IMainWnd::~IMainWnd()
 {
 	// Disconnect Events
+	this->Disconnect( wxEVT_MOVE, wxMoveEventHandler( IMainWnd::OnMove ) );
+	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( IMainWnd::OnSize ) );
 	m_btnGo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( IMainWnd::OnButtonClick_Go ), NULL, this );
 	m_dir->Disconnect( wxEVT_DIRCTRL_SELECTIONCHANGED, wxCommandEventHandler( IMainWnd::OnDirctrlSelectionChanged ), NULL, this );
 

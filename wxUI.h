@@ -49,6 +49,8 @@ namespace ui
 			gtl::wx::xMatView* m_view;
 
 			// Virtual event handlers, override them in your derived class
+			virtual void OnMove( wxMoveEvent& event ) = 0;
+			virtual void OnSize( wxSizeEvent& event ) = 0;
 			virtual void OnButtonClick_Go( wxCommandEvent& event ) = 0;
 			virtual void OnDirctrlSelectionChanged( wxCommandEvent& event ) = 0;
 
