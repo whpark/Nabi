@@ -1,17 +1,14 @@
 ﻿#include "pch.h"
 #include "wxDesktopApp.h"
 #include "MainWnd.h"
-#include "util.h"
-#include "gtl/wx/MatView.h"
 
 xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 	m_bInitialized = true;
-	LoadWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
+	gtl::wx::LoadWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
 
 	auto& app = wxGetApp();
 	wxString str;
-	app.m_reg.QueryValue(L"LastImage", str);
-	if (!str.empty()) {
+	if (app.m_reg.HasValue(L"LastImage") and app.m_reg.QueryValue(L"LastImage", str) and !str.empty()) {
 		std::filesystem::path path(str.ToStdWstring());
 		if (std::filesystem::is_regular_file(path))
 			path = path.parent_path();
@@ -45,7 +42,7 @@ xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 void xMainWnd::OnMove(wxMoveEvent& event) {
 	if (!m_bInitialized)
 		return;
-	SaveWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
+	gtl::wx::SaveWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
 }
 
 void xMainWnd::OnSize(wxSizeEvent& event) {
@@ -53,7 +50,7 @@ void xMainWnd::OnSize(wxSizeEvent& event) {
 	wxFrame::OnSize(event);
 	if (!m_bInitialized)
 		return;
-	SaveWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
+	gtl::wx::SaveWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
 }
 
 void xMainWnd::OnButtonClick_Go(wxCommandEvent& event) {

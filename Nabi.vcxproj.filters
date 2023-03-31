@@ -32,9 +32,6 @@
     <ClInclude Include="MainWnd.h">
       <Filter>Framework - wxWidgets</Filter>
     </ClInclude>
-    <ClInclude Include="util.h">
-      <Filter>Framework - wxWidgets</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wxDesktopApp.rc">
@@ -60,9 +57,6 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="MainWnd.cpp">
-      <Filter>Framework - wxWidgets</Filter>
-    </ClCompile>
-    <ClCompile Include="util.cpp">
       <Filter>Framework - wxWidgets</Filter>
     </ClCompile>
   </ItemGroup>
