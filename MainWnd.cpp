@@ -2,8 +2,15 @@
 #include "wxDesktopApp.h"
 #include "MainWnd.h"
 
+#include "wx/msw/private.h"
+
 xMainWnd::xMainWnd( wxWindow* parent ) : ui::IMainWnd( parent ) {
 	m_bInitialized = true;
+
+	wxIcon icon;
+	icon.SetHandle(::LoadIcon(wxGetInstance(), MAKEINTRESOURCEW(IDI_SMALL)));
+	this->SetIcon(icon);
+
 	gtl::wx::LoadWindowPosition(wxGetApp().m_reg, "MainWindow"s, this);
 
 	auto& app = wxGetApp();
