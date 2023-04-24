@@ -72,6 +72,10 @@ void xMainWnd::OnDirctrlSelectionChanged(wxCommandEvent& event) {
 	if (!std::filesystem::is_regular_file(path))
 		return;
 	auto img = gtl::LoadImageMat(path);
+	if (img.empty() and (path.extension() == L".bmp")) {
+		gtl::xSize2i pelsPerMeter;
+		img = gtl::LoadBitmapMat(path, pelsPerMeter);
+	}
 	if (img.empty())
 		return;
 	if (img.channels() == 3) {
