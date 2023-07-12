@@ -175,7 +175,7 @@ xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(Ta
     <PreLinkEvent />
     <PreBuildEvent>
       <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
-xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
+xcopy /dy $(PathGTL)\bin\gtl.wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
     </PreBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -210,7 +210,7 @@ xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(Ta
     <PreLinkEvent />
     <PreBuildEvent>
       <Command>xcopy /dy $(PathGTL)\bin\gtl.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)
-xcopy /dy $(PathGTL)\bin\wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
+xcopy /dy $(PathGTL)\bin\gtl.wx.x$(PlatformArchitecture)$(Configuration[0]).dll $(TargetDir)</Command>
     </PreBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
