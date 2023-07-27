@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWndClass</class>
+ <widget class="QMainWindow" name="MainWndClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>907</width>
+    <height>503</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QtWidgetsApplicationGTL</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="handleWidth">
+       <number>8</number>
+      </property>
+      <widget class="QTreeViewEx" name="folder">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="gtl::qt::xMatView" name="view" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>907</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string notr="true">Files</string>
+    </property>
+    <addaction name="actionRotate"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About Nabi</string>
+   </property>
+  </action>
+  <action name="actionRotate">
+   <property name="text">
+    <string>Rotate</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>gtl::qt::xMatView</class>
+   <extends>QWidget</extends>
+   <header>gtl/qt/MatView/MatView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QTreeViewEx</class>
+   <extends>QTreeView</extends>
+   <header>qtreeviewex.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

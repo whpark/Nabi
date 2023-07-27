@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+    </Filter>
+    <Filter Include="[ Framework ]">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;ui;</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="resource.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+    <ClCompile Include="MainWnd.cpp">
+      <Filter>[ Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>[ Framework ]</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>[ Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
+      <Filter>[ Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="QTreeViewEx.cpp">
+      <Filter>[ Framework ]</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="MainWnd.ui">
+      <Filter>[ Framework ]</Filter>
+    </QtUic>
+    <QtUic Include="AboutDlg.ui">
+      <Filter>[ Framework ]</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="MainWnd.h">
+      <Filter>[ Framework ]</Filter>
+    </QtMoc>
+    <QtMoc Include="AboutDlg.h">
+      <Filter>[ Framework ]</Filter>
+    </QtMoc>
+    <QtMoc Include="QTreeViewEx.h">
+      <Filter>[ Framework ]</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>[ Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>[ Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>[ Framework ]</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

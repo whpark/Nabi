@@ -1,4 +1,5 @@
 # Nabi
 Simple Image Viewer
 
-### dependency : wxWidgets, openCV, gtl
+### dependency : qt, openCV, gtl
+
