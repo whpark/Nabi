@@ -156,6 +156,8 @@ xcopy /dy $(PathGTL)\bin\gtl.qt.x$(PlatformArchitecture)$(Configuration[0]).dll 
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="app.ico" />
+    <Image Include="icon.ico" />
     <Image Include="icon.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

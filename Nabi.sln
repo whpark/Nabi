@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.33920.267
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nabi", "src\Nabi\Nabi.vcxproj", "{3A21CCAD-0814-4EC7-B6BA-1178A8C267C0}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup\setup.vdproj", "{A3AA83AA-27CE-46CE-AB8B-FC3CBB0BE87A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,8 @@ Global
 		{3A21CCAD-0814-4EC7-B6BA-1178A8C267C0}.Debug|x64.Build.0 = Debug|x64
 		{3A21CCAD-0814-4EC7-B6BA-1178A8C267C0}.Release|x64.ActiveCfg = Release|x64
 		{3A21CCAD-0814-4EC7-B6BA-1178A8C267C0}.Release|x64.Build.0 = Release|x64
+		{A3AA83AA-27CE-46CE-AB8B-FC3CBB0BE87A}.Debug|x64.ActiveCfg = Debug
+		{A3AA83AA-27CE-46CE-AB8B-FC3CBB0BE87A}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

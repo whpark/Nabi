@@ -75,5 +75,11 @@
     <Image Include="icon.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
