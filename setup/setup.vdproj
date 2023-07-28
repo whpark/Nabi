@@ -159,12 +159,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A50976BB4D8B4C8FB1FF1AE8466E193C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_A89D39E45FD04BB5903F4A2EA7591872"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -220,12 +214,6 @@
         "Entry"
         {
         "MsmKey" = "8:_D9AACBF1AFE14AF1BDDC9461192774EE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_DE32DED6FF864C0F8A78B496C4F09513"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -800,26 +788,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A50976BB4D8B4C8FB1FF1AE8466E193C"
-            {
-            "SourcePath" = "8:C:\\DevTools\\QT\\6.5.2\\bin\\libpng16.dll"
-            "TargetName" = "8:libpng16.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AAE4D8EC0007455287344EC7D19A16AA"
             {
             "SourcePath" = "8:..\\x64\\Release\\libwebpdecoder.dll"
@@ -984,26 +952,6 @@
             {
             "SourcePath" = "8:C:\\DevTools\\QT\\6.5.2\\bin\\Qt6OpenGLWidgets.dll"
             "TargetName" = "8:Qt6OpenGLWidgets.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DE32DED6FF864C0F8A78B496C4F09513"
-            {
-            "SourcePath" = "8:..\\x64\\Release\\zlib1.dll"
-            "TargetName" = "8:zlib1.dll"
             "Tag" = "8:"
             "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
             "Condition" = "8:"
@@ -1219,7 +1167,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Nabi"
         "ProductCode" = "8:{EB14D0D6-6007-4C17-B617-571D791F04C7}"
-        "PackageCode" = "8:{8DDD03EE-1B4A-4498-A5EF-1EB53E8554E9}"
+        "PackageCode" = "8:{C290C848-E755-472A-A1DC-40843EE158B9}"
         "UpgradeCode" = "8:{7392F085-F3D1-491A-9793-28B5249C5126}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
@@ -1782,7 +1730,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A89D39E45FD04BB5903F4A2EA7591872"
             {
-            "SourcePath" = "8:..\\x64\\Release\\Nabi.exe"
+            "SourcePath" = "8:..\\x64\\Debug\\Nabi.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
