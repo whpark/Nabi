@@ -1,5 +1,11 @@
 #include "pch.h"
+
 #include "AboutDlg.h"
+#include "gtl/qt/util.h"
+#include "gtl/qt/MatView/MatView.h"
+#include "gtl/qt/MatBitmapArchive.h"
+
+using namespace gtl::qt;
 
 xAboutDlg::xAboutDlg(QWidget* parent) : QDialog(parent) {
 	ui.setupUi(this);

@@ -135,6 +135,8 @@ xcopy /dy $(PathGTL)\bin\gtl.qt.x$(PlatformArchitecture)$(Configuration[0]).dll 
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="QTreeViewEx.cpp" />
+    <ClCompile Include="SaveOptionDlg.cpp" />
+    <QtMoc Include="SaveOptionDlg.h" />
     <QtMoc Include="AboutDlg.h" />
     <QtMoc Include="QTreeViewEx.h" />
     <ClInclude Include="resource.h" />
@@ -151,6 +153,7 @@ xcopy /dy $(PathGTL)\bin\gtl.qt.x$(PlatformArchitecture)$(Configuration[0]).dll 
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <QtUic Include="SaveOptionDlg.ui" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

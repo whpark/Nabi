@@ -12,7 +12,7 @@ void QTreeViewEx::selectionChanged(const QItemSelection& selected, const QItemSe
 	emit selChanged();
 }
 
-void QTreeViewEx::currentChanged(const QModelIndex& current, const QModelIndex& previous) {
-	base_t::currentChanged(current, previous);
-	emit selChanged();
-}
+//void QTreeViewEx::currentChanged(const QModelIndex& current, const QModelIndex& previous) {
+//	base_t::currentChanged(current, previous);
+//	emit selChanged();
+//}

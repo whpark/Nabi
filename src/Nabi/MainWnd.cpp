@@ -1,6 +1,16 @@
 #include "pch.h"
+
+#include "gtl/gtl.h"
+#include "gtl/qt/qt.h"
+#include "gtl/qt/util.h"
+#include "gtl/qt/MatView/MatView.h"
+#include "gtl/qt/MatBitmapArchive.h"
+
 #include "MainWnd.h"
 #include "AboutDlg.h"
+#include "SaveOptionDlg.h"
+
+using namespace gtl::qt;
 
 xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
     ui.setupUi(this);
@@ -43,11 +53,16 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	ui.view->LoadOption();
 
 	// Connection
-	connect(ui.actionAbout, &QAction::triggered, this, [this](auto) { xAboutDlg dlg(this); dlg.exec();});
-	//connect(ui.folder, &QTreeView::activated, this, &xMainWnd::OnFolder_Activated);
+	connect(ui.btnAbout, &QPushButton::clicked, this, [this](auto) { xAboutDlg dlg(this); dlg.exec();});
 	connect(ui.folder, &QTreeViewEx::selChanged, this, &this_t::OnFolder_SelChanged);
-	connect(ui.btnOpen, &QPushButton::clicked, this, &this_t::OnOpen_clicked);
-	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnOpen_clicked);
+	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnImage_Load);
+	connect(ui.btnLoad, &QPushButton::clicked, this, &this_t::OnImage_Load);
+	connect(ui.btnSave, &QPushButton::clicked, this, &this_t::OnImage_Save);
+
+	connect(ui.btnRotateLeft, &QPushButton::clicked, this, &this_t::OnImage_RotateLeft);
+	connect(ui.btnRotateRight, &QPushButton::clicked, this, &this_t::OnImage_RotateRight);
+	connect(ui.btnFlipLR, &QPushButton::clicked, this, &this_t::OnImage_FlipLR);
+	connect(ui.btnFlipUD, &QPushButton::clicked, this, &this_t::OnImage_FlipUD);
 }
 
 xMainWnd::~xMainWnd() {
@@ -68,17 +83,19 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			if (w < 0) w = -w;
 			if (h < 0) h = -h;
 			if ((uint64_t)w * h > 32767 * 32767) {
-				gtl::xSize2i pelsPerMeter;
 				bLoadBitmapMatTRIED = true;
-				img = gtl::LoadBitmapMat(path, pelsPerMeter);
+				if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
+					img = r.img;
+				}
 			}
 		}
 	}
 	if (img.empty())
 		img = gtl::LoadImageMat(path);
 	if (img.empty() and (path.extension() == L".bmp") and !bLoadBitmapMatTRIED) {
-		gtl::xSize2i pelsPerMeter;
-		img = gtl::LoadBitmapMat(path, pelsPerMeter);
+		if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
+			img = r.img;
+		}
 	}
 	if (img.empty())
 		return false;
@@ -102,7 +119,7 @@ void xMainWnd::OnFolder_SelChanged() {
 	ShowImage(path);
 }
 
-void xMainWnd::OnOpen_clicked() {
+void xMainWnd::OnImage_Load() {
 	std::filesystem::path path = ui.edtPath->text().toStdWString();
 	if (path.empty())
 		return;
@@ -110,4 +127,25 @@ void xMainWnd::OnOpen_clicked() {
 		ui.folder->setCurrentIndex(index);
 	else
 		ShowImage(path);
+}
+
+void xMainWnd::OnImage_Save() {
+	auto const& img = ui.view->GetImage();
+	if (img.empty())
+		return;
+	xSaveOptionDlg dlg(this);
+	if (auto r = dlg.exec(); r != QDialog::Accepted)
+		return;
+}
+
+void xMainWnd::OnImage_RotateLeft() {
+}
+
+void xMainWnd::OnImage_RotateRight() {
+}
+
+void xMainWnd::OnImage_FlipLR() {
+}
+
+void xMainWnd::OnImage_FlipUD() {
 }

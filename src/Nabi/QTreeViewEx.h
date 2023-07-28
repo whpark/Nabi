@@ -15,7 +15,7 @@ public:
 
 protected:
 	virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
-	virtual void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
+	//virtual void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
 signals:
 	void selChanged();
 

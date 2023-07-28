@@ -35,12 +35,18 @@
     <ClCompile Include="QTreeViewEx.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="SaveOptionDlg.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWnd.ui">
       <Filter>code</Filter>
     </QtUic>
     <QtUic Include="AboutDlg.ui">
+      <Filter>code</Filter>
+    </QtUic>
+    <QtUic Include="SaveOptionDlg.ui">
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>
@@ -52,6 +58,9 @@
       <Filter>code</Filter>
     </QtMoc>
     <QtMoc Include="QTreeViewEx.h">
+      <Filter>code</Filter>
+    </QtMoc>
+    <QtMoc Include="SaveOptionDlg.h">
       <Filter>code</Filter>
     </QtMoc>
   </ItemGroup>
