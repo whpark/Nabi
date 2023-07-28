@@ -25,6 +25,7 @@ protected:
 	// slots
 	//void OnFolder_Activated(const QModelIndex &index);
 	void OnFolder_SelChanged();
+	void OnOpen_clicked();
 
 private:
 	Ui::MainWndClass ui;

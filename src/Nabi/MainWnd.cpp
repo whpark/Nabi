@@ -46,6 +46,8 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	connect(ui.actionAbout, &QAction::triggered, this, [this](auto) { xAboutDlg dlg(this); dlg.exec();});
 	//connect(ui.folder, &QTreeView::activated, this, &xMainWnd::OnFolder_Activated);
 	connect(ui.folder, &QTreeViewEx::selChanged, this, &this_t::OnFolder_SelChanged);
+	connect(ui.btnOpen, &QPushButton::clicked, this, &this_t::OnOpen_clicked);
+	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnOpen_clicked);
 }
 
 xMainWnd::~xMainWnd() {
@@ -88,6 +90,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	auto str = ToQString(path);
 	m_reg.setValue(L"misc/LastImage", ToQString(path));
 	ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
+	ui.edtPath->setText(ToQString(path));
 	return true;
 }
 
@@ -97,4 +100,14 @@ void xMainWnd::OnFolder_SelChanged() {
 	if (path.empty())
 		return;
 	ShowImage(path);
+}
+
+void xMainWnd::OnOpen_clicked() {
+	std::filesystem::path path = ui.edtPath->text().toStdWString();
+	if (path.empty())
+		return;
+	if (auto index = m_modelFileSystem.index(ToQString(path)); index.isValid())
+		ui.folder->setCurrentIndex(index);
+	else
+		ShowImage(path);
 }
