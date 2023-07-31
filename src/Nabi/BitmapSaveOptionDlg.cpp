@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "BitmapSaveOptionDlg.h"
 
 using namespace gtl::qt;

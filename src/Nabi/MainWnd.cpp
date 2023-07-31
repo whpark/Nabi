@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "gtl/gtl.h"
 #include "gtl/qt/qt.h"

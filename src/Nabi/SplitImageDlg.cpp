@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SplitImageDlg.h"
 
 using namespace gtl::qt;

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "AboutDlg.h"
 #include "gtl/qt/util.h"

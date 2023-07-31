@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "QTreeViewEx.h"
 #include "ui_MainWnd.h"

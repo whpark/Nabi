@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "QTreeViewEx.h"
 
 QTreeViewEx::QTreeViewEx(QWidget* parent) : base_t(parent) {

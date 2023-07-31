@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "gtl/gtl.h"
 #include "gtl/qt/qt.h"
