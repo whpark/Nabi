@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SaveOptionDlgClass</class>
- <widget class="QDialog" name="SaveOptionDlgClass">
+ <class>BitmapSaveOptionDlgClass</class>
+ <widget class="QDialog" name="BitmapSaveOptionDlgClass">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>284</width>
-    <height>126</height>
+    <height>138</height>
    </rect>
   </property>
   <property name="focusPolicy">
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>SaveOptionDlg</string>
+   <string>BitmapSaveOptionDlg</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="2">
+      <widget class="QSpinBox" name="spinDPIy">
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="maximum">
+        <number>268435455</number>
+       </property>
+       <property name="value">
+        <number>360</number>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QSpinBox" name="spinDPIx">
        <property name="alignment">
@@ -32,23 +45,10 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
        <property name="text">
-        <string>Dots Per Inch (x,y) :</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QSpinBox" name="spinDPIy">
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="maximum">
-        <number>268435455</number>
-       </property>
-       <property name="value">
-        <number>360</number>
+        <string>Bit Per Pixel :</string>
        </property>
       </widget>
      </item>
@@ -82,20 +82,20 @@
        </item>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Bit Per Pixel :</string>
+        <string>Dots Per Inch (x,y) :</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="chkBottomToTop">
+     <item row="2" column="0" colspan="3">
+      <widget class="QCheckBox" name="chkTopToBottom">
        <property name="text">
-        <string>Bottom To Top</string>
+        <string>Top to Bottom (default : unchecked)</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>

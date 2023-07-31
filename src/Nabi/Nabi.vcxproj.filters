@@ -35,7 +35,7 @@
     <ClCompile Include="QTreeViewEx.cpp">
       <Filter>code</Filter>
     </ClCompile>
-    <ClCompile Include="SaveOptionDlg.cpp">
+    <ClCompile Include="BitmapSaveOptionDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="SplitImageDlg.cpp">
@@ -49,7 +49,7 @@
     <QtUic Include="AboutDlg.ui">
       <Filter>code</Filter>
     </QtUic>
-    <QtUic Include="SaveOptionDlg.ui">
+    <QtUic Include="BitmapSaveOptionDlg.ui">
       <Filter>code</Filter>
     </QtUic>
     <QtUic Include="SplitImageDlg.ui">
@@ -66,7 +66,7 @@
     <QtMoc Include="QTreeViewEx.h">
       <Filter>code</Filter>
     </QtMoc>
-    <QtMoc Include="SaveOptionDlg.h">
+    <QtMoc Include="BitmapSaveOptionDlg.h">
       <Filter>code</Filter>
     </QtMoc>
     <QtMoc Include="SplitImageDlg.h">
@@ -81,6 +81,9 @@
       <Filter>code</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapSaveOption.h">
       <Filter>code</Filter>
     </ClInclude>
   </ItemGroup>

@@ -135,12 +135,13 @@ xcopy /dy $(PathGTL)\bin\gtl.qt.x$(PlatformArchitecture)$(Configuration[0]).dll 
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="QTreeViewEx.cpp" />
-    <ClCompile Include="SaveOptionDlg.cpp" />
+    <ClCompile Include="BitmapSaveOptionDlg.cpp" />
     <ClCompile Include="SplitImageDlg.cpp" />
     <QtMoc Include="SplitImageDlg.h" />
-    <QtMoc Include="SaveOptionDlg.h" />
+    <QtMoc Include="BitmapSaveOptionDlg.h" />
     <QtMoc Include="AboutDlg.h" />
     <QtMoc Include="QTreeViewEx.h" />
+    <ClInclude Include="BitmapSaveOption.h" />
     <ClInclude Include="resource.h" />
     <QtRcc Include="resource.qrc" />
     <QtUic Include="AboutDlg.ui" />
@@ -155,7 +156,7 @@ xcopy /dy $(PathGTL)\bin\gtl.qt.x$(PlatformArchitecture)$(Configuration[0]).dll 
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <QtUic Include="SaveOptionDlg.ui" />
+    <QtUic Include="BitmapSaveOptionDlg.ui" />
     <QtUic Include="SplitImageDlg.ui" />
   </ItemGroup>
   <ItemGroup>

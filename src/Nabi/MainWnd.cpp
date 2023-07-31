@@ -8,12 +8,22 @@
 
 #include "MainWnd.h"
 #include "AboutDlg.h"
-#include "SaveOptionDlg.h"
+#include "BitmapSaveOptionDlg.h"
+#include "SplitImageDlg.h"
 
 using namespace gtl::qt;
 
 xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
     ui.setupUi(this);
+
+	if (s_palette_8bit.empty()) {
+		auto& pal = s_palette_8bit;
+		pal.reserve(256);
+		pal = s_palette_4bit;
+		for (size_t i = pal.size(); pal.size() < 256; i++) {
+			pal.push_back(gtl::color_bgra_t{(uint8_t)i, (uint8_t)i, (uint8_t)i});
+		}
+	}
 
 	// Application Icon
 	QIcon* icon = new QIcon(":/image/icon.png");
@@ -64,6 +74,7 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnImage_Load);
 	connect(ui.btnLoad, &QPushButton::clicked, this, &this_t::OnImage_Load);
 	connect(ui.btnSave, &QPushButton::clicked, this, &this_t::OnImage_Save);
+	connect(ui.btnSplit, &QPushButton::clicked, this, &this_t::OnImage_Split);
 
 	connect(ui.btnRotateLeft, &QPushButton::clicked, this, &this_t::OnImage_RotateLeft);
 	connect(ui.btnRotateRight, &QPushButton::clicked, this, &this_t::OnImage_RotateRight);
@@ -87,16 +98,20 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	cv::Mat img;
 	bool bLoadBitmapMatTRIED{};
 	std::string infoBMP;
+	sBitmapSaveOption optionBitmap;
 	if (path.extension() == L".bmp") {
 		auto [result, fileHeader, header] = gtl::LoadBitmapHeader(path);
 		if (result) {
 			auto bh = std::visit([](auto& arg) { return (gtl::BITMAP_HEADER&)arg; }, header);
 			infoBMP = std::format("BPP({}), dpi({}, {})", bh.nBPP, gtl::Round(bh.XPelsPerMeter * 25.4 / 1000), gtl::Round(bh.YPelsPerMeter * 25.4/ 1000));
+			optionBitmap.bpp = optionBitmap.GetBPP(bh.nBPP);
+			optionBitmap.dpi = optionBitmap.GetDPI({bh.XPelsPerMeter, bh.YPelsPerMeter});
+			optionBitmap.bTopToBottom = bh.height > 0;	// when bh.height is zero... assume bottom to top. default is bottom to top.
 			//auto w = bh.width;
 			//auto h = bh.height;
 			//if (w < 0) w = -w;
 			//if (h < 0) h = -h;
-			if (bh.nBPP <= 8 and bh.compression == 0 and bh.planes == 1/*(uint64_t)w * h > 32767 * 32767*/) {
+			if ((bh.nBPP <= 8) and (bh.compression == 0) and (bh.planes == 1) /* and ((uint64_t)w * h > 32767ull * 32767)*/) {
 				bLoadBitmapMatTRIED = true;
 				if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
 					img = r.img;
@@ -122,10 +137,55 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	auto str = ToQString(path);
 	m_reg.setValue(L"misc/LastImage", ToQString(path));
 	m_img = img;
+	m_optionBitmap.Reset();
+	m_optionBitmap = optionBitmap;
 	ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
 	ui.edtPath->setText(ToQString(path));
 	auto info = std::format("Size({}, {}) {}", img.cols, img.rows, infoBMP);
 	ui.edtImageInfo->setText(ToQString(info));
+	return true;
+}
+
+bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option) {
+	if (img0.empty() or path.empty())
+		return false;
+	cv::Mat img;
+	if (img0.channels() == 3) {
+		cv::cvtColor(img0, img, cv::COLOR_BGR2RGB);
+	}
+	else {
+		img = img0;
+	}
+	auto ext = path.extension().string();
+	if (ext.empty())
+		ext = ".png";
+	gtl::MakeLower(ext);
+	if ( (ext == ".bmp") and (img.channels() == 1) ) {
+
+		xWaitCursor wc;
+
+		std::span<gtl::color_bgra_t> palette;
+		switch (option.bpp) {
+		case sBitmapSaveOption::eBPP::_1: palette = s_palette_1bit; break;
+		case sBitmapSaveOption::eBPP::_4: palette = s_palette_4bit; break;
+		case sBitmapSaveOption::eBPP::_8: palette = s_palette_8bit; break;
+		}
+
+		// Save
+		if (!gtl::qt::SaveBitmapMatProgress(path, img, option.GetBPP(option.bpp), option.GetPelsPerMeter(option.dpi), palette, false, !option.bTopToBottom)) {
+			QMessageBox::critical(this, "Error", "Failed to save image.");
+			return false;
+		}
+	}
+	else {
+		xWaitCursor wc;
+		std::vector<int> params{ cv::IMWRITE_JPEG_QUALITY, 95};
+		std::vector<uchar> buf;
+		if (!cv::imencode(ext, img, buf, params) or !gtl::ContainerToFile(buf, path)) {
+			QMessageBox::critical(this, "Error", "Failed to save image.");
+			return false;
+		}
+	}
 	return true;
 }
 
@@ -148,16 +208,6 @@ void xMainWnd::OnImage_Load() {
 }
 
 void xMainWnd::OnImage_Save() {
-	cv::Mat img0 = m_img;
-	if (img0.empty())
-		return;
-	cv::Mat img;
-	if (img0.channels() == 3) {
-		cv::cvtColor(img0, img, cv::COLOR_BGR2RGB);
-	}
-	else {
-		img = img0;
-	}
 	QString strFolder;
 	if (auto index = ui.folder->currentIndex(); index.isValid()) {
 		strFolder = m_modelFileSystem.filePath(index);
@@ -167,72 +217,65 @@ void xMainWnd::OnImage_Save() {
 			strFolder = ToQString(path.wstring());
 		}
 	}
-	QString strPath = QFileDialog::getSaveFileName(this, "Save Image", strFolder, "Image Files (*.bmp *.jpg *.jpeg *.png *.tif *.tiff *.gif);;All Files(*.*)");
+	QString strPath = QFileDialog::getSaveFileName(this, "Save Image", strFolder, "Image Files (*.bmp *.jpg *.jpeg *.png *.tif *.tiff);;All Files(*.*)");
 	std::filesystem::path path = ToWString(strPath);
-	if (path.empty())
-		return;
+
+	auto option = m_optionBitmap;
 	auto ext = path.extension().string();
 	if (ext.empty())
 		ext = ".png";
 	gtl::MakeLower(ext);
-	if ( (ext == ".bmp") and (img.channels() == 1) ) {
-		xSaveOptionDlg dlg(this);
+	if ( (ext == ".bmp") and (m_img.channels() == 1) ) {
+		xBitmapSaveOptionDlg dlg(this);
+		dlg.m_option = option;
+		dlg.UpdateData(false);
 		if (auto r = dlg.exec(); r != QDialog::Accepted)
 			return;
-
-		xWaitCursor wc;
-
-		// Palette
-		static std::vector<gtl::color_bgra_t> palette_1bit {
-			gtl::color_bgra_t{  0,   0,   0},	// 0
-			gtl::color_bgra_t{255, 255, 255},	// 1
-		};
-		static std::vector<gtl::color_bgra_t> palette_4bit {
-			gtl::color_bgra_t{255, 255, 255},	// 0
-			gtl::color_bgra_t{  0,   0,   0},	// 1
-			gtl::color_bgra_t{120, 250,  70},	// 2
-			gtl::color_bgra_t{ 80,  50, 230},	// 3
-			gtl::color_bgra_t{ 80, 180, 250},	// 4
-			gtl::color_bgra_t{225, 110,  10},	// 5
-			gtl::color_bgra_t{240,   0,   0},	// 6
-			gtl::color_bgra_t{170,  50, 240},	// 7
-			gtl::color_bgra_t{240,   0,  50},	// 8
-			gtl::color_bgra_t{220,   0,   0},	// 9
-			gtl::color_bgra_t{200,   0,   0},	// 10
-			gtl::color_bgra_t{170,   0,   0},	// 11
-			gtl::color_bgra_t{150,   0,   0},	// 12
-			gtl::color_bgra_t{130,   0,   0},	// 13
-			gtl::color_bgra_t{100,   0,   0},	// 14
-			gtl::color_bgra_t{200, 100, 100},	// 15
-		};
-		static std::vector<gtl::color_bgra_t> palette_8bit = []{
-			std::vector<gtl::color_bgra_t> vec;
-			vec.reserve(256);
-			for (int i{}; i < 256; i++) {
-				vec.push_back(gtl::color_bgra_t{(uint8_t)i, (uint8_t)i, (uint8_t)i});
-			}
-			return vec;
-		}();
-
-		std::span<gtl::color_bgra_t> palette;
-		switch (dlg.m_eBPP) {
-		case xSaveOptionDlg::eBPP::_1: palette = palette_1bit; break;
-		case xSaveOptionDlg::eBPP::_4: palette = palette_4bit; break;
-		case xSaveOptionDlg::eBPP::_8: palette = palette_8bit; break;
-		}
-
-		// Save
-		gtl::qt::SaveBitmapMatProgress(path, img, dlg.GetBPP(dlg.m_eBPP), dlg.GetPelsPerMeter(dlg.m_dpi), palette, false, dlg.m_bBottomToTop);
+		option = dlg.m_option;
 	}
-	else {
-		xWaitCursor wc;
-		std::vector<int> params{ cv::IMWRITE_JPEG_QUALITY, 95};
-		std::vector<uchar> buf;
-		if (!cv::imencode(ext, img, buf, params) or !gtl::ContainerToFile(buf, path)) {
-			QMessageBox::critical(this, "Error", "Failed to save image.");
-			return;
+
+	SaveImage(m_img, path, option);
+}
+
+void xMainWnd::OnImage_Split() {
+	xSplitImageDlg dlg(m_img, this);
+	dlg.m_option = m_optionBitmap;
+	dlg.m_path = ToWString(ui.edtPath->text());
+	dlg.UpdateData(false);
+	if (auto r = dlg.exec(); r != QDialog::Accepted)
+		return;
+	gtl::xSize2i size = dlg.m_size;
+	if (size.cx <= 0)
+		size.cx = m_img.cols;
+	if (size.cy <= 0)
+		size.cy = m_img.rows;
+
+	auto option = dlg.m_option;
+	int nImage{};
+	for (int iy{}, y{}; y < m_img.rows; iy++, y += size.cy) {
+		for (int ix{}, x{}; x < m_img.cols; ix++, x += size.cx) {
+			gtl::xRect2i rect{x, y, x + size.cx, y + size.cy};
+			if (rect.right > m_img.cols)
+				rect.right = m_img.cols;
+			if (rect.bottom > m_img.rows)
+				rect.bottom = m_img.rows;
+			cv::Mat imgPart((cv::Size)size, m_img.type());
+			auto roi = gtl::GetSafeROI((cv::Rect)rect, m_img.size());
+			m_img(roi).copyTo(imgPart(cv::Rect(0, 0, roi.width, roi.height)));
+
+			std::filesystem::path path = dlg.m_path.parent_path();
+			path /= dlg.m_path.stem().wstring();
+			path += std::format(L"_X{:04d}Y{:04d}", ix+1, iy+1);
+			path += dlg.m_path.extension().wstring();
+
+			if (!SaveImage(imgPart, path, option))
+				return ;
+			nImage++;
 		}
 	}
+
+	QMessageBox::information(this, "Done", std::format("{} images saved", nImage).c_str());
+
 }
 
 void xMainWnd::OnImage_RotateLeft() {
