@@ -172,6 +172,8 @@ void xMainWnd::OnImage_Save() {
 	if (path.empty())
 		return;
 	auto ext = path.extension().string();
+	if (ext.empty())
+		ext = ".png";
 	gtl::MakeLower(ext);
 	if ( (ext == ".bmp") and (img.channels() == 1) ) {
 		xSaveOptionDlg dlg(this);
