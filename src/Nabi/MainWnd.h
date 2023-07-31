@@ -11,6 +11,7 @@ public:
 
 protected:
 	QFileSystemModel m_modelFileSystem;
+	cv::Mat m_img;
 public:
 	QSettings m_reg { "Biscuit-lab", "Nabi" };
 
@@ -29,6 +30,7 @@ protected:
 	void OnImage_Save();
 	void OnImage_RotateLeft();
 	void OnImage_RotateRight();
+	void OnImage_Rotate180();
 	void OnImage_FlipLR();
 	void OnImage_FlipUD();
 

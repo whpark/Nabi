@@ -101,6 +101,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="btnRotate180">
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>↻</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -222,10 +235,12 @@
  </customwidgets>
  <tabstops>
   <tabstop>folder</tabstop>
+  <tabstop>btnAbout</tabstop>
   <tabstop>edtPath</tabstop>
   <tabstop>btnLoad</tabstop>
   <tabstop>btnRotateLeft</tabstop>
   <tabstop>btnRotateRight</tabstop>
+  <tabstop>btnRotate180</tabstop>
   <tabstop>btnFlipLR</tabstop>
   <tabstop>btnFlipUD</tabstop>
   <tabstop>btnSave</tabstop>

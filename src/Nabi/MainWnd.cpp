@@ -61,6 +61,7 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 
 	connect(ui.btnRotateLeft, &QPushButton::clicked, this, &this_t::OnImage_RotateLeft);
 	connect(ui.btnRotateRight, &QPushButton::clicked, this, &this_t::OnImage_RotateRight);
+	connect(ui.btnRotate180, &QPushButton::clicked, this, &this_t::OnImage_Rotate180);
 	connect(ui.btnFlipLR, &QPushButton::clicked, this, &this_t::OnImage_FlipLR);
 	connect(ui.btnFlipUD, &QPushButton::clicked, this, &this_t::OnImage_FlipUD);
 }
@@ -106,6 +107,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	}
 	auto str = ToQString(path);
 	m_reg.setValue(L"misc/LastImage", ToQString(path));
+	m_img = img;
 	ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
 	ui.edtPath->setText(ToQString(path));
 	return true;
@@ -139,13 +141,31 @@ void xMainWnd::OnImage_Save() {
 }
 
 void xMainWnd::OnImage_RotateLeft() {
+	xWaitCursor wc;
+	cv::flip(m_img.t(), m_img, 0);
+	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_RotateRight() {
+	xWaitCursor wc;
+	cv::flip(m_img.t(), m_img, 1);
+	ui.view->SetImage(m_img, false);
+}
+
+void xMainWnd::OnImage_Rotate180() {
+	xWaitCursor wc;
+	cv::flip(m_img, m_img, -1);
+	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_FlipLR() {
+	xWaitCursor wc;
+	cv::flip(m_img, m_img, 1);
+	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_FlipUD() {
+	xWaitCursor wc;
+	cv::flip(m_img, m_img, 0);
+	ui.view->SetImage(m_img, false);
 }
