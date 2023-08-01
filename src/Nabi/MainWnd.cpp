@@ -208,6 +208,9 @@ void xMainWnd::OnImage_Load() {
 }
 
 void xMainWnd::OnImage_Save() {
+	if (m_img.empty())
+		return;
+
 	QString strFolder;
 	if (auto index = ui.folder->currentIndex(); index.isValid()) {
 		strFolder = m_modelFileSystem.filePath(index);
