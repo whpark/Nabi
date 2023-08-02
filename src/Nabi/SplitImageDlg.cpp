@@ -22,14 +22,16 @@ xSplitImageDlg::xSplitImageDlg(cv::Mat img, QWidget* parent) : m_img(img), base_
 	connect(ui.spinInterleave_PixelGroupingX, &QSpinBox::valueChanged, this, &this_t::OnInterleavePixelGroupingXChanged);
 	connect(ui.spinInterleave_PixelGroupingY, &QSpinBox::valueChanged, this, &this_t::OnInterleavePixelGroupingYChanged);
 
-	connect(ui.buttonBox, &QDialogButtonBox::accepted, this, [this]{ UpdateData(true); accept(); });
-	connect(ui.buttonBox, &QDialogButtonBox::rejected, this, [this]{ reject(); });
+	connect(ui.btnOK, &QPushButton::clicked, this, [this]{ 
+		if (UpdateData(true)) 
+			accept(); });
+	connect(ui.btnCancel, &QPushButton::clicked, this, [this]{ reject(); });
 }
 
 xSplitImageDlg::~xSplitImageDlg() {
 }
 
-void xSplitImageDlg::UpdateData(bool bSave) {
+bool xSplitImageDlg::UpdateData(bool bSave) {
 
 	UpdateWidgetValue(bSave, ui.edtPath, m_path);
 	UpdateWidgetValue(bSave, ui.spinWidth, m_size.cx);
@@ -45,13 +47,59 @@ void xSplitImageDlg::UpdateData(bool bSave) {
 	UpdateWidgetValue(bSave, ui.spinInterleave_FieldsCountY, m_interleave.sizeFields.cy);
 	UpdateWidgetValue(bSave, ui.spinInterleave_PixelGroupingX, m_interleave.sizePixelGroup.cx);
 	UpdateWidgetValue(bSave, ui.spinInterleave_PixelGroupingY, m_interleave.sizePixelGroup.cy);
+
+	if (bSave) {
+		if (m_interleave.bUse) {
+			bool bValidated{};
+			do {
+				int nPageX = GetPageX();
+				int nPageY = GetPageY();
+				if (m_interleave.sizeFields.cx <= 0)
+					m_interleave.sizeFields.cx = 1;
+				if (m_interleave.sizeFields.cy <= 0)
+					m_interleave.sizeFields.cy = 1;
+
+				if (nPageX % m_interleave.sizeFields.cx)
+					break;
+				if (nPageY % m_interleave.sizeFields.cy)
+					break;
+
+				if (m_interleave.sizePixelGroup.cx <= 0)
+					m_interleave.sizePixelGroup.cx = 1;
+				if (m_interleave.sizePixelGroup.cy <= 0)
+					m_interleave.sizePixelGroup.cy = 1;
+
+				if (m_size.cx <= 0)
+					m_size.cx = m_img.cols;
+				if (m_size.cy <= 0)
+					m_size.cy = m_img.rows;
+
+				if (nPageX == 1 and m_interleave.sizePixelGroup.cx > 1)
+					break;
+				if (nPageY == 1 and m_interleave.sizePixelGroup.cy > 1)
+					break;
+				if (m_size.cx % m_interleave.sizePixelGroup.cx)
+					break;
+				if (m_size.cy % m_interleave.sizePixelGroup.cy)
+					break;
+
+				bValidated = true;
+
+			} while(false);
+			
+			if (!bValidated)
+				return false;
+		}
+	}
+
+	return true;
 }
 
 auto GetDivisors(int n) {
 	std::vector<int> divisors;
 	divisors.push_back(1);
-	for (int i{2}, n2 = (n >= 2 ? n/2 : n); i < n2; i++) {
-		;if (n % i)
+	for (int i{2}, n2 = (n >= 2 ? n/2 : n); i <= n2; i++) {
+		if (n % i)
 			continue;
 		divisors.push_back(i);
 	}
@@ -126,7 +174,22 @@ void xSplitImageDlg::OnInterleaveFieldsYChanged(int val) {
 }
 
 void xSplitImageDlg::OnInterleavePixelGroupingXChanged(int val) {
+	if (val <= 0)
+		val = 1;
+	int w = ui.spinWidth->value();
+	if (w <= 0)
+		w = m_img.cols;
+	auto strColor = (GetPageX() == 1 and w > 1) or (w % val) ? "red" : "green";
+	ui.spinInterleave_PixelGroupingX->setStyleSheet(std::format("background-color: {}", strColor).c_str());
 }
 
 void xSplitImageDlg::OnInterleavePixelGroupingYChanged(int val) {
+	if (val <= 0)
+		val = 1;
+	int h = ui.spinHeight->value();
+	if (h <= 0)
+		h = m_img.rows;
+	auto strColor = (GetPageY() == 1 and h > 1) or (h % val) ? "red" : "green";
+	ui.spinInterleave_PixelGroupingY->setStyleSheet(std::format("background-color: {}", strColor).c_str());
 }
+

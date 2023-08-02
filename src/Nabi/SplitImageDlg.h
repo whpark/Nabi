@@ -28,7 +28,7 @@ public:
 	xSplitImageDlg(cv::Mat img, QWidget* parent = nullptr);
 	~xSplitImageDlg();
 
-	void UpdateData(bool bSave);
+	bool UpdateData(bool bSave);
 
 	int GetPageX(int v = 0) const {
 		if (v <= 0)

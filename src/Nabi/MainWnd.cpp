@@ -241,6 +241,9 @@ void xMainWnd::OnImage_Save() {
 }
 
 void xMainWnd::OnImage_Split() {
+	if (m_img.empty())
+		return;
+
 	xSplitImageDlg dlg(m_img, this);
 	dlg.m_option = m_optionBitmap;
 	dlg.m_path = ToWString(ui.edtPath->text());
