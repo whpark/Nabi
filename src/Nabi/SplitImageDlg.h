@@ -18,17 +18,39 @@ public:
 	gtl::xSize2i m_size;
 	sBitmapSaveOption m_option;
 
+	struct sInterleave {
+		bool bUse{};
+		gtl::xSize2i sizeFields{1,1};
+		gtl::xSize2i sizePixelGroup{1,1};
+	} m_interleave;
+
 public:
 	xSplitImageDlg(cv::Mat img, QWidget* parent = nullptr);
 	~xSplitImageDlg();
 
 	void UpdateData(bool bSave);
 
+	int GetPageX(int v = 0) const {
+		if (v <= 0)
+			v = ui.spinWidth->value();
+		return (v <= 0) ? 1 : (m_img.cols / v) + (m_img.cols % v ? 1 : 0);
+	}
+	int GetPageY(int v = 0) const {
+		if (v <= 0)
+			v = ui.spinHeight->value();
+		return (v <= 0) ? 1 : (m_img.rows / v) + (m_img.rows % v ? 1 : 0);
+	}
+
 protected:
 	void OnWidthChanged(int val);
 	void OnHeightChanged(int val);
 	void OnBrowse();
 	void OnPathChanged();
+
+	void OnInterleaveFieldsXChanged(int val);
+	void OnInterleaveFieldsYChanged(int val);
+	void OnInterleavePixelGroupingXChanged(int val);
+	void OnInterleavePixelGroupingYChanged(int val);
 
 private:
 	Ui::SplitImageDlgClass ui;
