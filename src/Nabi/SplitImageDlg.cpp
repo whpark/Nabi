@@ -9,6 +9,7 @@ using namespace gtl::qt;
 
 xSplitImageDlg::xSplitImageDlg(cv::Mat img, QWidget* parent) : m_img(img), base_t(parent) {
 	ui.setupUi(this);
+	ui.groupInterleave->hide();
 
 	UpdateData(false);
 

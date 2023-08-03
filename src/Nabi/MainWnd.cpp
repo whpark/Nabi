@@ -149,6 +149,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option) {
 	if (img0.empty() or path.empty())
 		return false;
+	xWaitCursor wc;
 	cv::Mat img;
 	if (img0.channels() == 3) {
 		cv::cvtColor(img0, img, cv::COLOR_BGR2RGB);
@@ -161,8 +162,6 @@ bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitma
 		ext = ".png";
 	gtl::MakeLower(ext);
 	if ( (ext == ".bmp") and (img.channels() == 1) ) {
-
-		xWaitCursor wc;
 
 		std::span<gtl::color_bgra_t> palette;
 		switch (option.bpp) {
@@ -178,7 +177,6 @@ bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitma
 		}
 	}
 	else {
-		xWaitCursor wc;
 		std::vector<int> params{ cv::IMWRITE_JPEG_QUALITY, 95};
 		std::vector<uchar> buf;
 		if (!cv::imencode(ext, img, buf, params) or !gtl::ContainerToFile(buf, path)) {
@@ -250,6 +248,11 @@ void xMainWnd::OnImage_Split() {
 	dlg.UpdateData(false);
 	if (auto r = dlg.exec(); r != QDialog::Accepted)
 		return;
+	auto const& page = dlg.GetPage();
+	if (page.cx <= 1 and page.cy <= 1)
+		return;
+	//auto const& interleave = dlg.m_interleave;
+	//bool bInterleave = interleave.bUse and ( (interleave.sizeFields.cx > 1) or (interleave.sizeFields.cy > 1) );
 	gtl::xSize2i size = dlg.m_size;
 	if (size.cx <= 0)
 		size.cx = m_img.cols;

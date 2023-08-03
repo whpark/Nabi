@@ -30,6 +30,9 @@ public:
 
 	bool UpdateData(bool bSave);
 
+	gtl::xSize2i GetPage() const {
+		return gtl::xSize2i{GetPageX(), GetPageY()};
+	}
 	int GetPageX(int v = 0) const {
 		if (v <= 0)
 			v = ui.spinWidth->value();
