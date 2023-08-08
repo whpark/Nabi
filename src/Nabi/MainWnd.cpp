@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 
+#include "opencv2/core/utility.hpp"
+
 #include "gtl/gtl.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
@@ -99,7 +101,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	bool bLoadBitmapMatTRIED{};
 	std::string infoBMP;
 	sBitmapSaveOption optionBitmap;
-	if (path.extension() == L".bmp") {
+	if (gtl::tszicmp<char>(path.extension().string(), ".bmp"sv) == 0) {
 		auto [result, fileHeader, header] = gtl::LoadBitmapHeader(path);
 		if (result) {
 			auto bh = std::visit([](auto& arg) { return (gtl::BITMAP_HEADER&)arg; }, header);
@@ -119,9 +121,10 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			}
 		}
 	}
-	if (img.empty())
+	if (img.empty()) {
 		img = gtl::LoadImageMat(path);
-	if (img.empty() and (path.extension() == L".bmp") and !bLoadBitmapMatTRIED) {
+	}
+	if (img.empty() and (gtl::tszicmp<char>(path.extension().string(), ".bmp") == 0) and !bLoadBitmapMatTRIED) {
 		if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
 			img = r.img;
 		}
