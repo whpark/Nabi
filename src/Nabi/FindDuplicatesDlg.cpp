@@ -31,7 +31,7 @@ xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	OnEdtRoot_ReturnPressed();
 
 	ui.treeFiles->setModel(&m_model);
-	ui.treeFiles->setColumnWidth(0, 600);
+	ui.treeFiles->setColumnWidth(0, 500);
 }
 
 xFindDuplicatesDlg::~xFindDuplicatesDlg() {
