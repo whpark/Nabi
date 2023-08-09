@@ -1,27 +1,10 @@
 ﻿#include "pch.h"
-#include "scn/scn.h"
-#include "MainWnd.h"
+#include "App.h"
 #include "gtl/win/EnvironmentVariable.h"
 
-//OPENCV_IO_MAX_IMAGE_PIXELS=1099511627776
 int main(int argc, char* argv[]) {
-
-	QApplication a(argc, argv);
-	a.setStyle("fusion");
-
-	//if (auto hProcess = GetCurrentProcess()) {
-	//	HANDLE hToken{};
-	//	OpenProcessToken(hProcess, TOKEN_QUERY, &hToken);
-	//	PRIVILEGE_SET ps{.PrivilegeCount = 1, .Control = PRIVILEGE_SET_ALL_NECESSARY};
-	//	BOOL result{};
-	//	PrivilegeCheck(hToken, &ps, &result);
-	//	if (result) {
-	//		qDebug() << "PrivilegeCheck: " << result;
-	//	}
-	//}
-
-	xMainWnd w;
-	w.show();
+	//auto r = gtl::SetCurrentPath_BinFolder();
+	xApp a(argc, argv);
 
 	auto var = qEnvironmentVariable("OPENCV_IO_MAX_IMAGE_PIXELS");
 	uint64_t max = var.toULongLong();
@@ -31,8 +14,7 @@ int main(int argc, char* argv[]) {
 			"openCV - Large Image not supported.",
 			QMessageBox::Close);
 		if (r == QMessageBox::Yes) {
-			// export environmet variable
-
+			// export environment variable
 			gtl::qt::xWaitCursor wc;
 
 			using namespace gtl::win;
@@ -50,13 +32,15 @@ int main(int argc, char* argv[]) {
 				"openCV - Large Image",
 				"Please, Restart Program",
 				QMessageBox::Close);
-
-			//auto h = RegisterApplicationRestart(L"", 0);
-
-			return 0;
 		}
 	}
 
 	return a.exec();
 }
-//
+
+xApp::xApp(int &argc, char **argv) : QApplication(argc, argv) {
+	m_wndMain.show();
+}
+
+xApp::~xApp() {
+}

@@ -137,6 +137,14 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FindDuplicatesDlg.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
+    <ClCompile Include="FindDuplicatesModel.cpp" />
+    <ClCompile Include="FolderSystemModel.cpp" />
     <ClCompile Include="QTreeViewEx.cpp" />
     <ClCompile Include="BitmapSaveOptionDlg.cpp" />
     <ClCompile Include="SplitImageDlg.cpp" />
@@ -144,15 +152,20 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
     <QtMoc Include="BitmapSaveOptionDlg.h" />
     <QtMoc Include="AboutDlg.h" />
     <QtMoc Include="QTreeViewEx.h" />
+    <QtMoc Include="App.h" />
     <ClInclude Include="BitmapSaveOption.h" />
+    <QtMoc Include="FindDuplicatesDlg.h" />
+    <QtMoc Include="FolderSystemModel.h" />
+    <QtMoc Include="FindDuplicatesModel.h" />
     <ClInclude Include="resource.h" />
     <QtRcc Include="resource.qrc" />
     <QtUic Include="AboutDlg.ui" />
+    <QtUic Include="FindDuplicatesDlg.ui" />
     <QtUic Include="MainWnd.ui" />
     <QtMoc Include="MainWnd.h" />
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="MainWnd.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="App.cpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClCompile Include="pch.cpp">

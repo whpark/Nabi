@@ -8,6 +8,7 @@
 #include "gtl/qt/MatView/MatView.h"
 #include "gtl/qt/MatBitmapArchive.h"
 
+#include "App.h"
 #include "MainWnd.h"
 #include "AboutDlg.h"
 #include "BitmapSaveOptionDlg.h"
@@ -16,6 +17,8 @@
 using namespace gtl::qt;
 
 xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
+	theApp().setStyle("fusion");
+
     ui.setupUi(this);
 
 	if (s_palette_8bit.empty()) {
@@ -70,6 +73,8 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	};
 	ui.view->LoadOption();
 
+	m_dlgFindDuplicate.emplace(this);
+
 	// Connection
 	connect(ui.btnAbout, &QPushButton::clicked, this, [this](auto) { xAboutDlg dlg(this); dlg.exec(); });
 	connect(ui.folder, &QTreeViewEx::selChanged, this, &this_t::OnFolder_SelChanged);
@@ -83,6 +88,8 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	connect(ui.btnRotate180, &QPushButton::clicked, this, &this_t::OnImage_Rotate180);
 	connect(ui.btnFlipLR, &QPushButton::clicked, this, &this_t::OnImage_FlipLR);
 	connect(ui.btnFlipUD, &QPushButton::clicked, this, &this_t::OnImage_FlipUD);
+
+	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &this_t::OnBtnFindDuplicates_Clicked);
 }
 
 xMainWnd::~xMainWnd() {
@@ -318,4 +325,11 @@ void xMainWnd::OnImage_FlipUD() {
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, 0);
 	ui.view->SetImage(m_img, false);
+}
+
+void xMainWnd::OnBtnFindDuplicates_Clicked() {
+	if (m_dlgFindDuplicate) {
+		m_dlgFindDuplicate->show();
+		m_dlgFindDuplicate->setFocus();
+	}
 }

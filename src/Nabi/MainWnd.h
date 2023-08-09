@@ -2,8 +2,8 @@
 
 #include "QTreeViewEx.h"
 #include "ui_MainWnd.h"
-
 #include "BitmapSaveOption.h"
+#include "FindDuplicatesDlg.h"
 
 class xMainWnd : public QMainWindow {
 	Q_OBJECT
@@ -15,6 +15,9 @@ protected:
 	QFileSystemModel m_modelFileSystem;
 	cv::Mat m_img;
 	sBitmapSaveOption m_optionBitmap;
+
+	std::optional<xFindDuplicatesDlg> m_dlgFindDuplicate;
+
 public:
 	QSettings m_reg { "Biscuit-lab", "Nabi" };
 
@@ -39,6 +42,8 @@ protected:
 	void OnImage_Rotate180();
 	void OnImage_FlipLR();
 	void OnImage_FlipUD();
+
+	void OnBtnFindDuplicates_Clicked();
 
 protected:
 	// Palette
