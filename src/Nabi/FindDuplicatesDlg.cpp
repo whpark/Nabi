@@ -110,8 +110,12 @@ void xFindDuplicatesDlg::DuplicatedImageFinder(std::stop_token st, std::vector<s
 	if (!st.stop_requested()) {
 		std::sort(files.begin(), files.end(),
 			[](auto const& a, auto const& b) -> bool {
-				if (a.len == b.len)
+				if (a.len == b.len) {
+					if (a.tLastWrite == b.tLastWrite) {
+						return a.path.wstring().size() < b.path.wstring().size();	// not by name. by path length
+					}
 					return a.tLastWrite < b.tLastWrite;
+				}
 				return a.len < b.len;
 			} 
 		);
@@ -176,6 +180,8 @@ void xFindDuplicatesDlg::OnBtnFindDuplicates_Clicked() {
 		m_worker->get_stop_source().request_stop();
 		return;
 	}
+
+	m_model.Clear();
 
 	m_done = false;
 	std::vector<std::filesystem::path> folders;

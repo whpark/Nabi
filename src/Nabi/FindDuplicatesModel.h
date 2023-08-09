@@ -116,6 +116,11 @@ public:
 	}
 	//bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
 
+	void Clear() {
+		beginResetModel();
+		m_top.children.clear();
+		endResetModel();
+	}
 	bool InsertLeaf(std::unique_ptr<sDuplicatedItem> item) {
 		if (!item or item->parent != &m_top)
 			return false;
