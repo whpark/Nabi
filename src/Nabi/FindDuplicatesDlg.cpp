@@ -42,7 +42,7 @@ xFindDuplicatesDlg::~xFindDuplicatesDlg() {
 }
 
 bool CompareFile(std::filesystem::path const& path1, std::filesystem::path const& path2) {
-	constexpr size_t len{1024*1024};
+	constexpr size_t len{4*1024};
 	static char buf1[len], buf2[len];
 
 	std::ifstream f1(path1, std::ios::binary), f2(path2, std::ios::binary);
