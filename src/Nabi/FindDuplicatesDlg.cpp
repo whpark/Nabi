@@ -8,6 +8,7 @@ namespace stdfs = std::filesystem;
 
 static QColor const crON(0, 255, 0);
 static QColor const crOFF(192, 192, 192);
+static QColor const crText(0, 0, 0);
 
 xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	ui.setupUi(this);
@@ -21,8 +22,8 @@ xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	connect(ui.btnDeleteDuplicates, &QPushButton::clicked, this, &xFindDuplicatesDlg::OnBtnDeleteDuplicates_Clicked);
 	connect(&m_timerUI, &QTimer::timeout, this, &xFindDuplicatesDlg::OnTimerUI_Timeout);
 
-	ui.btnFindDuplicates->SetMainColor(crOFF);
-	ui.btnDeleteDuplicates->SetMainColor(crOFF);
+	ui.btnFindDuplicates->SetMainColor(crOFF, crText);
+	ui.btnDeleteDuplicates->SetMainColor(crOFF, crText);
 
 	auto& reg = theApp().GetReg();
 	auto root = reg.value("FindDuplicatesDlg/root").toString();
@@ -30,7 +31,7 @@ xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	OnEdtRoot_ReturnPressed();
 
 	ui.treeFiles->setModel(&m_model);
-	ui.treeFiles->setColumnWidth(0, 400);
+	ui.treeFiles->setColumnWidth(0, 600);
 }
 
 xFindDuplicatesDlg::~xFindDuplicatesDlg() {
@@ -194,7 +195,7 @@ void xFindDuplicatesDlg::OnBtnFindDuplicates_Clicked() {
 	m_worker.emplace([this, folders](std::stop_token st) { DuplicatedImageFinder(st, folders, ui.chkRecursive->isChecked()); });
 
 	m_timerUI.start(100ms);
-	ui.btnFindDuplicates->SetMainColor(crON);
+	ui.btnFindDuplicates->SetMainColor(crON, crText);
 }
 
 void xFindDuplicatesDlg::OnBtnDeleteDuplicates_Clicked() {
@@ -216,7 +217,7 @@ void xFindDuplicatesDlg::OnTimerUI_Timeout() {
 		m_done = false;
 		m_timerUI.stop();
 
-		ui.btnFindDuplicates->SetMainColor(crOFF);
+		ui.btnFindDuplicates->SetMainColor(crOFF, crText);
 	}
 
 	// status

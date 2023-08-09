@@ -105,7 +105,15 @@ public:
 	}
 	//bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-	//QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+		if (role == Qt::DisplayRole) {
+			switch (section) {
+			case 0: return "path";
+			case 1: return "size";
+			}
+		}
+		return {};
+	}
 	//bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
 
 	bool InsertLeaf(std::unique_ptr<sDuplicatedItem> item) {
