@@ -25,7 +25,7 @@ xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	ui.btnFindDuplicates->SetMainColor(crOFF, crText);
 	ui.btnDeleteDuplicates->SetMainColor(crOFF, crText);
 
-	auto& reg = theApp().GetReg();
+	auto& reg = theApp->GetReg();
 	auto root = reg.value("FindDuplicatesDlg/root").toString();
 	ui.edtRoot->setText(root);
 	OnEdtRoot_ReturnPressed();
@@ -164,7 +164,7 @@ void xFindDuplicatesDlg::OnEdtRoot_ReturnPressed() {
 	std::filesystem::path path(strRoot.toStdWString());
 	if (!std::filesystem::is_directory(path))
 		return ;
-	theApp().GetReg().setValue("FindDuplicatesDlg/root", strRoot);
+	theApp->GetReg().setValue("FindDuplicatesDlg/root", strRoot);
 	auto index = m_modelFolder.setRootPath(strRoot);
 	ui.treeFolder->setRootIndex(index);
 }

@@ -2,26 +2,35 @@
 #include "App.h"
 #include "gtl/win/EnvironmentVariable.h"
 
+std::optional<xApp> theApp;
+
 int main(int argc, char* argv[]) {
 	//auto r = gtl::SetCurrentPath_BinFolder();
-	xApp app(argc, argv);
-	if (!app.Init())
+	theApp.emplace(argc, argv);
+	if (!theApp->Init())
 		return -1;
 
-	return app.exec();
+	return theApp->exec();
 }
 
 xApp::xApp(int &argc, char **argv) : QApplication(argc, argv) {
-	theApp().setStyle("fusion");
+}
+
+xApp::~xApp() {
 }
 
 bool xApp::Init() {
+	setStyle("fusion");
+	std::this_thread::sleep_for(100ms);
+
 	m_wndMain = std::make_unique<xMainWnd>();
 	m_wndMain->show();
 
-	auto const* var = std::getenv("OPENCV_IO_MAX_IMAGE_PIXELS");
-	auto len = std::strlen(var);
-	auto max = gtl::tszto<uint64_t>(var, var+len);
+	uint64_t max{};
+	if (auto const* var = std::getenv("OPENCV_IO_MAX_IMAGE_PIXELS")) {
+		auto len = std::strlen(var);
+		max = gtl::tszto<uint64_t>(var, var+len);
+	}
 	if (max < 0x01ull << 40) {
 		auto r = QMessageBox::warning(nullptr,
 			"openCV - Large Image",
@@ -53,7 +62,4 @@ bool xApp::Init() {
 	}
 
 	return true;
-}
-
-xApp::~xApp() {
 }
