@@ -39,7 +39,10 @@ int main(int argc, char* argv[]) {
 }
 
 xApp::xApp(int &argc, char **argv) : QApplication(argc, argv) {
-	m_wndMain.show();
+	theApp().setStyle("fusion");
+
+	m_wndMain = std::make_unique<xMainWnd>();
+	m_wndMain->show();
 }
 
 xApp::~xApp() {

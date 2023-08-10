@@ -17,7 +17,6 @@
 using namespace gtl::qt;
 
 xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
-	theApp().setStyle("fusion");
 
     ui.setupUi(this);
 
