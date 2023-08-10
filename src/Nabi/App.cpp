@@ -4,15 +4,30 @@
 
 int main(int argc, char* argv[]) {
 	//auto r = gtl::SetCurrentPath_BinFolder();
-	xApp a(argc, argv);
+	xApp app(argc, argv);
+	if (!app.Init())
+		return -1;
 
-	auto var = qEnvironmentVariable("OPENCV_IO_MAX_IMAGE_PIXELS");
-	uint64_t max = var.toULongLong();
+	return app.exec();
+}
+
+xApp::xApp(int &argc, char **argv) : QApplication(argc, argv) {
+	theApp().setStyle("fusion");
+}
+
+bool xApp::Init() {
+	m_wndMain = std::make_unique<xMainWnd>();
+	m_wndMain->show();
+
+	auto const* var = std::getenv("OPENCV_IO_MAX_IMAGE_PIXELS");
+	auto len = std::strlen(var);
+	auto max = gtl::tszto<uint64_t>(var, var+len);
 	if (max < 0x01ull << 40) {
 		auto r = QMessageBox::warning(nullptr,
 			"openCV - Large Image",
-			"openCV - Large Image not supported.",
-			QMessageBox::Close);
+			"openCV - Large Image not supported. Do you want to use Large Image?",
+			QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Cancel);
+
 		if (r == QMessageBox::Yes) {
 			// export environment variable
 			gtl::qt::xWaitCursor wc;
@@ -32,17 +47,12 @@ int main(int argc, char* argv[]) {
 				"openCV - Large Image",
 				"Please, Restart Program",
 				QMessageBox::Close);
+
+			return false;
 		}
 	}
 
-	return a.exec();
-}
-
-xApp::xApp(int &argc, char **argv) : QApplication(argc, argv) {
-	theApp().setStyle("fusion");
-
-	m_wndMain = std::make_unique<xMainWnd>();
-	m_wndMain->show();
+	return true;
 }
 
 xApp::~xApp() {

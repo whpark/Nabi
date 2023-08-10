@@ -17,10 +17,12 @@ public:
 	xApp(int &argc, char **argv/*, int flag = ApplicationFlags*/);
 	~xApp();
 
-	xMainWnd& GetMainWnd() { return *m_wndMain; }
+public:
+	bool Init();
 
 public:
 	QSettings& GetReg() { return m_reg; };
+	xMainWnd& GetMainWnd() { return *m_wndMain; }
 
 };
 
