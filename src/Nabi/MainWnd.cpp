@@ -25,6 +25,18 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 
     ui.setupUi(this);
 
+	// QCompleter for ui.edtPath
+	{
+		m_completer.emplace(this);
+		m_modelForCompleter.emplace(this);
+		m_modelForCompleter->setRootPath("");
+		m_completer->setModel(&*m_modelForCompleter);
+		
+		m_completer->setCompletionMode(QCompleter::PopupCompletion);
+		m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+		ui.edtPath->setCompleter(&*m_completer);
+	}
+
 	if (s_palette_8bit.empty()) {
 		auto& pal = s_palette_8bit;
 		pal.reserve(256);

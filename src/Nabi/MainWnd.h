@@ -16,6 +16,9 @@ protected:
 	cv::Mat m_img;
 	sBitmapSaveOption m_optionBitmap;
 
+	std::optional<QFileSystemModel> m_modelForCompleter;
+	std::optional<QCompleter> m_completer;
+
 	std::optional<xFindDuplicatesDlg> m_dlgFindDuplicate;
 
 public:
