@@ -5,7 +5,7 @@ struct sBitmapSaveOption {
 	enum class eBPP : int { _1, /*_2, */_4, _8, _24/*, _32*/, none = -1 };
 
 	eBPP bpp{};
-	gtl::xSize2i dpi;
+	gtl::xSize2d dpi;
 	bool bTopToBottom{false};
 
 	void Reset() {
@@ -34,7 +34,7 @@ struct sBitmapSaveOption {
 		default : return eBPP::none;
 		}
 	}
-	static constexpr gtl::xSize2i GetPelsPerMeter(gtl::xSize2d dpi) {
+	static constexpr gtl::xSize2d GetPelsPerMeter(gtl::xSize2d dpi) {
 		return { gtl::Round(dpi.cx * 1000 / 25.4), gtl::Round(dpi.cy * 1000/25.4)};
 	}
 	static constexpr gtl::xSize2d GetDPI(gtl::xSize2i pelsPerMeter) {

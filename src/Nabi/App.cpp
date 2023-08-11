@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "App.h"
 #include "gtl/win/EnvironmentVariable.h"
+#include "FreeImage.h"
 
 std::optional<xApp> theApp;
 
@@ -10,13 +11,20 @@ int main(int argc, char* argv[]) {
 	if (!theApp->Init())
 		return -1;
 
-	return theApp->exec();
+	auto r = theApp->exec();
+	theApp.reset();
+
+	return r;
 }
 
 xApp::xApp(int &argc, char **argv) : QApplication(argc, argv) {
+	FreeImage_Initialise();
+	//QString str = FreeImage_GetCopyrightMessage();
+	////This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
 }
 
 xApp::~xApp() {
+	FreeImage_DeInitialise();
 }
 
 bool xApp::Init() {

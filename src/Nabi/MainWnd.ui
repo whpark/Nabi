@@ -23,7 +23,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTreeViewEx" name="folder">
@@ -53,6 +53,16 @@
             </property>
             <property name="text">
              <string>About</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="chkUseFreeImage">
+            <property name="text">
+             <string>use FreeImage</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -314,14 +324,18 @@
  <tabstops>
   <tabstop>folder</tabstop>
   <tabstop>btnAbout</tabstop>
+  <tabstop>chkUseFreeImage</tabstop>
+  <tabstop>btnFindDuplicates</tabstop>
   <tabstop>edtPath</tabstop>
   <tabstop>btnLoad</tabstop>
+  <tabstop>edtImageInfo</tabstop>
   <tabstop>btnRotateLeft</tabstop>
   <tabstop>btnRotateRight</tabstop>
   <tabstop>btnRotate180</tabstop>
   <tabstop>btnFlipLR</tabstop>
   <tabstop>btnFlipUD</tabstop>
   <tabstop>btnSave</tabstop>
+  <tabstop>btnSplit</tabstop>
   <tabstop>view</tabstop>
  </tabstops>
  <resources>

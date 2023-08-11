@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 
+#include "gsl/gsl"
+
 #include "opencv2/core/utility.hpp"
 
 #include "gtl/gtl.h"
@@ -7,12 +9,15 @@
 #include "gtl/qt/util.h"
 #include "gtl/qt/MatView/MatView.h"
 #include "gtl/qt/MatBitmapArchive.h"
+#include "gtl/qt/ProgressDlg.h"
 
 #include "App.h"
 #include "MainWnd.h"
 #include "AboutDlg.h"
 #include "BitmapSaveOptionDlg.h"
 #include "SplitImageDlg.h"
+
+#include "FreeImage.h"
 
 using namespace gtl::qt;
 
@@ -66,11 +71,15 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 			if (str.isEmpty())
 				return false;
 			auto buffer = ToString(str);
-			glz::read_json(option, buffer);
+			auto err = glz::read_json(option, buffer);
+			//if (err)
+			//	return false;
 		}
 		return true;
 	};
 	ui.view->LoadOption();
+
+	ui.chkUseFreeImage->setChecked(m_reg.value("misc/useFreeImage", true).toBool());
 
 	m_dlgFindDuplicate.emplace(this);
 
@@ -102,55 +111,157 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	if (!gtl::IsImageExtension(path))
 		return false;
 
+	m_reg.setValue("misc/useFreeImage", ui.chkUseFreeImage->isChecked());
+
 	xWaitCursor wc;
 	cv::Mat img;
-	bool bLoadBitmapMatTRIED{};
-	std::string infoBMP;
-	sBitmapSaveOption optionBitmap;
-	if (gtl::tszicmp<char>(path.extension().string(), ".bmp"sv) == 0) {
-		auto [result, fileHeader, header] = gtl::LoadBitmapHeader(path);
-		if (result) {
-			auto bh = std::visit([](auto& arg) { return (gtl::BITMAP_HEADER&)arg; }, header);
-			infoBMP = std::format("BPP({}), dpi({}, {})", bh.nBPP, gtl::Round(bh.XPelsPerMeter * 25.4 / 1000), gtl::Round(bh.YPelsPerMeter * 25.4/ 1000));
-			optionBitmap.bpp = optionBitmap.GetBPP(bh.nBPP);
-			optionBitmap.dpi = optionBitmap.GetDPI({bh.XPelsPerMeter, bh.YPelsPerMeter});
-			optionBitmap.bTopToBottom = bh.height > 0;	// when bh.height is zero... assume bottom to top. default is bottom to top.
-			//auto w = bh.width;
-			//auto h = bh.height;
-			//if (w < 0) w = -w;
-			//if (h < 0) h = -h;
-			if ((bh.nBPP <= 8) and (bh.compression == 0) and (bh.planes == 1) /* and ((uint64_t)w * h > 32767ull * 32767)*/) {
-				bLoadBitmapMatTRIED = true;
-				if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
-					img = r.img;
+
+	// test FreeImage
+	std::optional<sBitmapSaveOption> optionBitmap;
+
+#ifdef _DEBUG
+	auto t0 = std::chrono::steady_clock::now();
+#endif
+
+	// Use FreeImage
+	while (ui.chkUseFreeImage->isChecked()) {
+		auto eFileType = FreeImage_GetFIFFromFilename(path.extension().string().c_str());
+	#if 0	// Progress Dialog
+		size_t sizeFile = std::filesystem::file_size(path);
+		if (!sizeFile)
+			break;
+
+		std::ifstream f(path, std::ios::binary);
+		if (!f.is_open())
+			break;
+
+		gtl::qt::xProgressDlg dlg(this);
+		dlg.m_message = std::format(L"Loading : {}", path.wstring());
+		FreeImageIO io{ nullptr, nullptr, nullptr, nullptr};
+		FIBITMAP* fb{};
+
+		struct sCookie {
+			std::ifstream& is;
+			gtl::qt::xProgressDlg& dlg;
+			size_t len;
+			size_t read {};
+		} cookie { .is = f, .dlg = dlg, .len = sizeFile };
+
+		io.read_proc = [](void* buffer, unsigned size, unsigned count, fi_handle handle) -> unsigned {
+			auto* p = (sCookie*)(handle);
+			auto nToRead = size * count;
+			p->is.read((char*)buffer, nToRead);
+			p->read += nToRead;
+			if (!p->dlg.m_callback(p->read * 100 / p->len, false, false))
+				return 0;
+			return count;
+		};
+		io.write_proc = nullptr;
+		io.tell_proc = [](fi_handle handle) -> long {
+			auto* p = (sCookie*)(handle);
+			return static_cast<long>(p->is.tellg());
+		};
+		io.seek_proc = [](fi_handle handle, long offset, int origin) -> int {
+			auto* p = (sCookie*)(handle);
+			p->is.seekg(offset, origin);
+			return p->is.fail() ? 1 : 0;
+		};
+		dlg.m_rThreadWorker = std::make_unique<std::jthread>([&]() {
+			fb = FreeImage_LoadFromHandle(eFileType, &io, &cookie, 0);
+			dlg.m_callback(100, true, fb?false:true);
+		});
+
+		auto r = dlg.exec();
+
+		xWaitCursor wc;
+		dlg.m_rThreadWorker->join();
+
+		if (r != QDialog::Accepted)
+			return false;
+	#else
+		auto* fb = FreeImage_LoadU(eFileType, path.c_str(), 0);
+	#endif
+
+		if (fb) {
+			gsl::final_action fa([&]{FreeImage_Unload(fb);});
+
+			img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
+			//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
+				optionBitmap.emplace();
+				auto& o = *optionBitmap;
+				o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
+				o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
+				o.bTopToBottom = false;
+			//}
+		}
+
+		break;
+	}
+
+	if (img.empty()) {
+		bool bLoadBitmapMatTRIED{};
+		if (gtl::tszicmp<char>(path.extension().string(), ".bmp"sv) == 0) {
+			if (img.empty()) {
+				auto [result, fileHeader, header] = gtl::LoadBitmapHeader(path);
+				if (result) {
+					auto bh = std::visit([](auto& arg) { return (gtl::BITMAP_HEADER&)arg; }, header);
+					optionBitmap.emplace();
+					auto& o = *optionBitmap;
+					o.bpp = o.GetBPP(bh.nBPP);
+					o.dpi = o.GetDPI({bh.XPelsPerMeter, bh.YPelsPerMeter});
+					o.bTopToBottom = bh.height > 0;	// when bh.height is zero... assume bottom to top. default is bottom to top.
+					//auto w = bh.width;
+					//auto h = bh.height;
+					//if (w < 0) w = -w;
+					//if (h < 0) h = -h;
+					if ((bh.nBPP <= 8) and (bh.compression == 0) and (bh.planes == 1) /* and ((uint64_t)w * h > 32767ull * 32767)*/) {
+						bLoadBitmapMatTRIED = true;
+						if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
+							img = r.img;
+						}
+					}
 				}
 			}
 		}
-	}
-	if (img.empty()) {
-		img = gtl::LoadImageMat(path);
-	}
-	if (img.empty() and (gtl::tszicmp<char>(path.extension().string(), ".bmp") == 0) and !bLoadBitmapMatTRIED) {
-		if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
-			img = r.img;
+		if (img.empty()) {
+			img = gtl::LoadImageMat(path);
+		}
+		if (img.empty() and (gtl::tszicmp<char>(path.extension().string(), ".bmp") == 0) and !bLoadBitmapMatTRIED) {
+			if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
+				img = r.img;
+			}
+		}
+		if (img.empty())
+			return false;
+		if (img.channels() == 3) {
+			cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGR2RGB);
+		}
+		else if (img.channels() == 4) {
+			cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGRA2RGBA);
 		}
 	}
-	if (img.empty())
-		return false;
-	if (img.channels() == 3) {
-		cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGR2RGB);
+
+#ifdef _DEBUG 
+	if constexpr (false) s{
+		auto t1 = std::chrono::steady_clock::now();
+		auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+		auto msg = std::format("Size({}, {}), LoadTime({}ms)", img.cols, img.rows, ts.count());
+		QMessageBox::information(this, "Info", ToQString(msg));
 	}
-	else if (img.channels() == 4) {
-		cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGRA2RGBA);
-	}
+#endif
+
 	auto str = ToQString(path);
 	m_reg.setValue(L"misc/LastImage", ToQString(path));
 	m_img = img;
-	m_optionBitmap.Reset();
-	m_optionBitmap = optionBitmap;
+	m_optionBitmap = optionBitmap.value_or(sBitmapSaveOption{});	// set or reset
 	ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
 	ui.edtPath->setText(ToQString(path));
-	auto info = std::format("Size({}, {}) {}", img.cols, img.rows, infoBMP);
+
+	auto info = std::format("Size({}, {})", img.cols, img.rows);
+	if (optionBitmap) {
+		auto const& o = *optionBitmap;
+		info += std::format(" BPP({}), dpi({}, {})", o.GetBPP(o.bpp), o.dpi.cx, o.dpi.cy);
+	}
 	ui.edtImageInfo->setText(ToQString(info));
 	return true;
 }
