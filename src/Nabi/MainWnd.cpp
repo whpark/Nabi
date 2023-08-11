@@ -164,7 +164,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			auto nToRead = size * count;
 			p->is.read((char*)buffer, nToRead);
 			p->read += nToRead;
-			if (!p->dlg.m_callback(p->read * 100 / p->len, false, false))
+			if (!p->dlg.UpdateProgress(p->read * 100 / p->len, false, false))
 				return 0;
 			return count;
 		};
