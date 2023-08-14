@@ -2,7 +2,6 @@
 #include "App.h"
 #include "gtl/win/EnvironmentVariable.h"
 #include "FreeImage.h"
-#include "libenvpp/env.hpp"
 
 std::optional<xApp> theApp;
 
