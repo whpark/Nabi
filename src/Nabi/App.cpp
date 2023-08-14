@@ -2,6 +2,7 @@
 #include "App.h"
 #include "gtl/win/EnvironmentVariable.h"
 #include "FreeImage.h"
+#include "libenvpp/env.hpp"
 
 std::optional<xApp> theApp;
 
@@ -34,12 +35,14 @@ bool xApp::Init() {
 	m_wndMain = std::make_unique<xMainWnd>();
 	m_wndMain->show();
 
-	uint64_t max{};
+	// check large image support
+	// https://docs.opencv.org/4.5.2/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56
+	uint64_t nMaxPixelCount{};
 	if (auto const* var = std::getenv("OPENCV_IO_MAX_IMAGE_PIXELS")) {
 		auto len = std::strlen(var);
-		max = gtl::tszto<uint64_t>(var, var+len);
+		nMaxPixelCount = gtl::tszto<uint64_t>(var, var+len);
 	}
-	if (max < 0x01ull << 40) {
+	if ( nMaxPixelCount < (0x01ull << 40) ) {
 		auto r = QMessageBox::warning(nullptr,
 			"openCV - Large Image",
 			"openCV - Large Image not supported. Do you want to use Large Image?",
@@ -58,14 +61,18 @@ bool xApp::Init() {
 				var.Set(L"OPENCV_IO_MAX_IMAGE_WIDTH", std::format(L"{}", 0x01ull << 24));
 				var.Set(L"OPENCV_IO_MAX_IMAGE_HEIGHT", std::format(L"{}", 0x01ull << 24));
 				var.Broadcast();
-			}
 
+				QMessageBox::warning(nullptr,
+					"openCV - Large Image",
+					"Please, Restart Program",
+					QMessageBox::Close);
+				return false;
+			}
 			QMessageBox::warning(nullptr,
 				"openCV - Large Image",
-				"Please, Restart Program",
+				"Failed... large image might not be supported.",
 				QMessageBox::Close);
-
-			return false;
+			return true;
 		}
 	}
 
