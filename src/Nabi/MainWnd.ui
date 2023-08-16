@@ -99,7 +99,20 @@
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
+          <item>
+           <widget class="QCheckBox" name="chkGPUEnabled">
+            <property name="text">
+             <string>GPU</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QLineEdit" name="edtPath"/>
           </item>

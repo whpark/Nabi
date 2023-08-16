@@ -25,6 +25,9 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 
     ui.setupUi(this);
 
+	ui.chkGPUEnabled->setCheckable(true);
+	ui.chkGPUEnabled->setCheckState(gtl::CheckGPU(true) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+
 	// QCompleter for ui.edtPath
 	{
 		m_completer.emplace(this);
@@ -254,7 +257,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	}
 
 #ifdef _DEBUG 
-	if constexpr (false) s{
+	if constexpr (false) {
 		auto t1 = std::chrono::steady_clock::now();
 		auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
 		auto msg = std::format("Size({}, {}), LoadTime({}ms)", img.cols, img.rows, ts.count());
