@@ -1,16 +1,5 @@
 ﻿#include "pch.h"
 
-#include "gsl/gsl"
-
-#include "opencv2/core/utility.hpp"
-
-#include "gtl/gtl.h"
-#include "gtl/qt/qt.h"
-#include "gtl/qt/util.h"
-#include "gtl/qt/MatView/MatView.h"
-#include "gtl/qt/MatBitmapArchive.h"
-#include "gtl/qt/ProgressDlg.h"
-
 #include "App.h"
 #include "MainWnd.h"
 #include "AboutDlg.h"
