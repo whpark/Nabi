@@ -398,7 +398,7 @@ void xMainWnd::OnImage_Split() {
 
 			std::filesystem::path path = dlg.m_path.parent_path();
 			path /= dlg.m_path.stem().wstring();
-			path += std::format(L"_X{:04d}Y{:04d}", ix+1, iy+1);
+			path += std::format(L"_x{:04d}y{:04d}", ix+1, iy+1);
 			path += dlg.m_path.extension().wstring();
 
 			if (!SaveImage(imgPart, path, option))
