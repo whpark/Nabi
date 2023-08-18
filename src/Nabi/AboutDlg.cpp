@@ -21,7 +21,7 @@ xAboutDlg::xAboutDlg(QWidget* parent) : QDialog(parent) {
 		static std::vector<std::string> const months { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", };
 		auto pos = std::find(months.begin(), months.end(), month);
 		auto m = std::distance(months.begin(), pos) + 1;
-		strBuildDate = ToQString(std::format("{}-{:02d}-{:02d}", year, (int)m, day));
+		strBuildDate = ToQString(std::format("{}-{:02d}-{:02d} {}", year, (int)m, day, __TIME__));
 	} catch (...) {
 		strBuildDate = __DATE__;
 	}
