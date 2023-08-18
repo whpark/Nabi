@@ -13,6 +13,9 @@ static QColor const crText(0, 0, 0);
 xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	ui.setupUi(this);
 
+	m_completer.emplace(this, std::filesystem::path{}, false);
+	ui.edtRoot->setCompleter(&*m_completer);
+
 	ui.treeFolder->setModel(&m_modelFolder);
 	ui.treeFolder->setColumnWidth(0, 300);
 

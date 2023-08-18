@@ -18,16 +18,8 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	ui.chkGPUEnabled->setEnabled(false);
 
 	// QCompleter for ui.edtPath
-	{
-		m_completer.emplace(this);
-		m_modelForCompleter.emplace(this);
-		m_modelForCompleter->setRootPath("");
-		m_completer->setModel(&*m_modelForCompleter);
-		
-		m_completer->setCompletionMode(QCompleter::PopupCompletion);
-		m_completer->setCaseSensitivity(Qt::CaseInsensitive);
-		ui.edtPath->setCompleter(&*m_completer);
-	}
+	m_completer.emplace(this, std::filesystem::path{}, false);
+	ui.edtPath->setCompleter(&*m_completer);
 
 	if (s_palette_8bit.empty()) {
 		auto& pal = s_palette_8bit;
@@ -130,7 +122,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	// Use FreeImage
 	while (ui.chkUseFreeImage->isChecked()) {
 		auto eFileType = FreeImage_GetFIFFromFilename(path.extension().string().c_str());
-	#if 0	// Progress Dialog
+	#if 1	// Progress Dialog
 		size_t sizeFile = std::filesystem::file_size(path);
 		if (!sizeFile)
 			break;
@@ -172,7 +164,19 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 		};
 		dlg.m_rThreadWorker = std::make_unique<std::jthread>([&]() {
 			fb = FreeImage_LoadFromHandle(eFileType, &io, &cookie, 0);
-			dlg.m_callback(100, true, fb?false:true);
+			dlg.m_message = L"Post Processing...";
+			gsl::final_action fa([&]{FreeImage_Unload(fb);});
+
+			img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
+			//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
+				optionBitmap.emplace();
+				auto& o = *optionBitmap;
+				o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
+				o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
+				o.bTopToBottom = false;
+			//}
+
+			dlg.UpdateProgress(100, true, fb?false:true);
 		});
 
 		auto r = dlg.exec();
@@ -184,8 +188,6 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			return false;
 	#else
 		auto* fb = FreeImage_LoadU(eFileType, path.c_str(), 0);
-	#endif
-
 		if (fb) {
 			gsl::final_action fa([&]{FreeImage_Unload(fb);});
 
@@ -198,6 +200,8 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 				o.bTopToBottom = false;
 			//}
 		}
+	#endif
+
 
 		break;
 	}
@@ -316,7 +320,8 @@ void xMainWnd::OnFolder_SelChanged() {
 	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
 	if (path.empty())
 		return;
-	ShowImage(path);
+	if (!ShowImage(path))
+		ui.view->SetImage({});
 }
 
 void xMainWnd::OnImage_Load() {
@@ -325,8 +330,10 @@ void xMainWnd::OnImage_Load() {
 		return;
 	if (auto index = m_modelFileSystem.index(ToQString(path)); index.isValid())
 		ui.folder->setCurrentIndex(index);
-	else
-		ShowImage(path);
+	else {
+		if (!ShowImage(path))
+			ui.view->SetImage({});
+	}
 }
 
 void xMainWnd::OnImage_Save() {

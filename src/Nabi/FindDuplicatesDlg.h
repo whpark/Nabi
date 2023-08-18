@@ -4,6 +4,7 @@
 #include "ui_FindDuplicatesDlg.h"
 #include "FolderSystemModel.h"
 #include "FindDuplicatesModel.h"
+#include "gtl/qt/QPathCompleter.h"
 
 class xFindDuplicatesDlg : public QDialog {
 	Q_OBJECT
@@ -15,6 +16,8 @@ protected:
 	xFolderSystemModel m_modelFolder;
 	xFindDuplicatesModel m_model;
 	QTimer m_timerUI;
+
+	std::optional<gtl::qt::QPathCompleter> m_completer;
 
 public:
 	xFindDuplicatesDlg(QWidget* parent = nullptr);
