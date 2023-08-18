@@ -104,7 +104,11 @@ xMainWnd::~xMainWnd() {
 }
 
 bool xMainWnd::ShowImage(std::filesystem::path const& path) {
-	if (!gtl::IsImageExtension(path))
+	std::error_code ec;
+	size_t sizeFile = std::filesystem::file_size(path, ec);
+	if (!sizeFile)
+		return false;
+	if (!std::filesystem::is_regular_file(path, ec))
 		return false;
 
 	m_reg.setValue("misc/useFreeImage", ui.chkUseFreeImage->isChecked());
@@ -122,86 +126,87 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	// Use FreeImage
 	while (ui.chkUseFreeImage->isChecked()) {
 		auto eFileType = FreeImage_GetFIFFromFilename(path.extension().string().c_str());
-	#if 1	// Progress Dialog
-		size_t sizeFile = std::filesystem::file_size(path);
-		if (!sizeFile)
+		if (eFileType == FIF_UNKNOWN)
 			break;
 
-		std::ifstream f(path, std::ios::binary);
-		if (!f.is_open())
-			break;
+		bool bUseProgressDlg = sizeFile > 1024 * 1024 * 10;
 
-		gtl::qt::xProgressDlg dlg(this);
-		dlg.m_message = std::format(L"Loading : {}", path.wstring());
-		FreeImageIO io{ nullptr, nullptr, nullptr, nullptr};
-		FIBITMAP* fb{};
+		if (bUseProgressDlg) {
+			std::ifstream f(path, std::ios::binary);
+			if (!f.is_open())
+				break;
 
-		struct sCookie {
-			std::ifstream& is;
-			gtl::qt::xProgressDlg& dlg;
-			size_t len;
-			size_t read {};
-		} cookie { .is = f, .dlg = dlg, .len = sizeFile };
+			gtl::qt::xProgressDlg dlg(this);
+			dlg.m_message = std::format(L"Loading : {}", path.wstring());
+			FreeImageIO io{ nullptr, nullptr, nullptr, nullptr};
+			FIBITMAP* fb{};
 
-		io.read_proc = [](void* buffer, unsigned size, unsigned count, fi_handle handle) -> unsigned {
-			auto* p = (sCookie*)(handle);
-			auto nToRead = size * count;
-			p->is.read((char*)buffer, nToRead);
-			p->read += nToRead;
-			if (!p->dlg.UpdateProgress(p->read * 100 / p->len, false, false))
-				return 0;
-			return count;
-		};
-		io.write_proc = nullptr;
-		io.tell_proc = [](fi_handle handle) -> long {
-			auto* p = (sCookie*)(handle);
-			return static_cast<long>(p->is.tellg());
-		};
-		io.seek_proc = [](fi_handle handle, long offset, int origin) -> int {
-			auto* p = (sCookie*)(handle);
-			p->is.seekg(offset, origin);
-			return p->is.fail() ? 1 : 0;
-		};
-		dlg.m_rThreadWorker = std::make_unique<std::jthread>([&]() {
-			fb = FreeImage_LoadFromHandle(eFileType, &io, &cookie, 0);
-			dlg.m_message = L"Post Processing...";
-			gsl::final_action fa([&]{FreeImage_Unload(fb);});
+			struct sCookie {
+				std::ifstream& is;
+				gtl::qt::xProgressDlg& dlg;
+				size_t len;
+				size_t read {};
+			} cookie { .is = f, .dlg = dlg, .len = sizeFile };
 
-			img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
-			//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
-				optionBitmap.emplace();
-				auto& o = *optionBitmap;
-				o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
-				o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
-				o.bTopToBottom = false;
-			//}
+			io.read_proc = [](void* buffer, unsigned size, unsigned count, fi_handle handle) -> unsigned {
+				auto* p = (sCookie*)(handle);
+				auto nToRead = size * count;
+				p->is.read((char*)buffer, nToRead);
+				p->read += nToRead;
+				if (!p->dlg.UpdateProgress(p->read * 100 / p->len, false, false))
+					return 0;
+				return count;
+			};
+			io.write_proc = nullptr;
+			io.tell_proc = [](fi_handle handle) -> long {
+				auto* p = (sCookie*)(handle);
+				return static_cast<long>(p->is.tellg());
+			};
+			io.seek_proc = [](fi_handle handle, long offset, int origin) -> int {
+				auto* p = (sCookie*)(handle);
+				p->is.seekg(offset, origin);
+				return p->is.fail() ? 1 : 0;
+			};
+			dlg.m_rThreadWorker = std::make_unique<std::jthread>([&]() {
+				fb = FreeImage_LoadFromHandle(eFileType, &io, &cookie, 0);
+				dlg.m_message = L"Post Processing...";
+				gsl::final_action fa([&]{FreeImage_Unload(fb);});
 
-			dlg.UpdateProgress(100, true, fb?false:true);
-		});
+				img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
+				//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
+					optionBitmap.emplace();
+					auto& o = *optionBitmap;
+					o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
+					o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
+					o.bTopToBottom = false;
+				//}
 
-		auto r = dlg.exec();
+				dlg.UpdateProgress(100, true, fb?false:true);
+			});
 
-		xWaitCursor wc;
-		dlg.m_rThreadWorker->join();
+			auto r = dlg.exec();
 
-		if (r != QDialog::Accepted)
-			return false;
-	#else
-		auto* fb = FreeImage_LoadU(eFileType, path.c_str(), 0);
-		if (fb) {
-			gsl::final_action fa([&]{FreeImage_Unload(fb);});
+			xWaitCursor wc;
+			dlg.m_rThreadWorker->join();
 
-			img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
-			//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
-				optionBitmap.emplace();
-				auto& o = *optionBitmap;
-				o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
-				o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
-				o.bTopToBottom = false;
-			//}
+			if (r != QDialog::Accepted)
+				return false;
 		}
-	#endif
+		else {
+			auto* fb = FreeImage_LoadU(eFileType, path.c_str(), 0);
+			if (fb) {
+				gsl::final_action fa([&]{FreeImage_Unload(fb);});
 
+				img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
+				//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
+					optionBitmap.emplace();
+					auto& o = *optionBitmap;
+					o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
+					o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
+					o.bTopToBottom = false;
+				//}
+			}
+		}
 
 		break;
 	}
@@ -232,6 +237,8 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			}
 		}
 		if (img.empty()) {
+			if (!gtl::IsImageExtension(path))
+				return false;
 			img = gtl::LoadImageMat(path);
 		}
 		if (img.empty() and (gtl::tszicmp<char>(path.extension().string(), ".bmp") == 0) and !bLoadBitmapMatTRIED) {

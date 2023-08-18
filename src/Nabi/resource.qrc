@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/image">
         <file>icon.png</file>
-        <file>FreeImage_logo.jpg</file>
+        <file>FreeImage_logo.png</file>
     </qresource>
 </RCC>
