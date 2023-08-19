@@ -2,6 +2,9 @@
 #include "App.h"
 #include "FindDuplicatesDlg.h"
 #include "gtl/qt/QColorButton.h"
+#include "gtl/mat_helper.h"
+
+#include "FreeImagePlus.h"
 
 using namespace gtl::qt;
 namespace stdfs = std::filesystem;
@@ -19,12 +22,6 @@ xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 	ui.treeFolder->setModel(&m_modelFolder);
 	ui.treeFolder->setColumnWidth(0, 300);
 
-	connect(ui.edtRoot, &QLineEdit::returnPressed, this, &xFindDuplicatesDlg::OnEdtRoot_ReturnPressed);
-	connect(ui.toolBrowse, &QToolButton::clicked, this, &xFindDuplicatesDlg::OnToolBrowse_Clicked);
-	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &xFindDuplicatesDlg::OnBtnFindDuplicates_Clicked);
-	connect(ui.btnDeleteDuplicates, &QPushButton::clicked, this, &xFindDuplicatesDlg::OnBtnDeleteDuplicates_Clicked);
-	connect(&m_timerUI, &QTimer::timeout, this, &xFindDuplicatesDlg::OnTimerUI_Timeout);
-
 	ui.btnFindDuplicates->SetMainColor(crOFF, crText);
 	ui.btnDeleteDuplicates->SetMainColor(crOFF, crText);
 
@@ -35,6 +32,13 @@ xFindDuplicatesDlg::xFindDuplicatesDlg(QWidget* parent) : QDialog(parent) {
 
 	ui.treeFiles->setModel(&m_model);
 	ui.treeFiles->setColumnWidth(0, 500);
+
+	connect(ui.edtRoot, &QLineEdit::returnPressed, this, &xFindDuplicatesDlg::OnEdtRoot_ReturnPressed);
+	connect(ui.toolBrowse, &QToolButton::clicked, this, &xFindDuplicatesDlg::OnToolBrowse_Clicked);
+	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &xFindDuplicatesDlg::OnBtnFindDuplicates_Clicked);
+	connect(ui.btnDeleteDuplicates, &QPushButton::clicked, this, &xFindDuplicatesDlg::OnBtnDeleteDuplicates_Clicked);
+	connect(&m_timerUI, &QTimer::timeout, this, &xFindDuplicatesDlg::OnTimerUI_Timeout);
+	connect(ui.treeFiles->selectionModel(), &QItemSelectionModel::currentChanged, this, &xFindDuplicatesDlg::OnTreeFiles_CurrentChanged);
 }
 
 xFindDuplicatesDlg::~xFindDuplicatesDlg() {
@@ -217,6 +221,40 @@ void xFindDuplicatesDlg::OnBtnDeleteDuplicates_Clicked() {
 			stdfs::remove(c->path, ec);
 		}
 	}
+}
+
+void xFindDuplicatesDlg::OnTreeFiles_CurrentChanged(QModelIndex const &current, QModelIndex const& previous) {
+	auto* item = m_model.GetItem(current);
+	if (!item)
+		return;
+
+	cv::Mat img;
+
+	auto const& path = item->path;
+
+	if (theApp->GetMainWnd().UseFreeImage()) {
+		if (auto eFileType = FreeImage_GetFIFFromFilename(path.extension().string().c_str());
+			eFileType == FIF_UNKNOWN)
+		{
+			if (auto* fb = FreeImage_LoadU(eFileType, path.c_str(), 0)) {
+				gsl::final_action fa([&]{FreeImage_Unload(fb);});
+				img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
+			}
+		}
+	}
+	if (img.empty()) {
+		img = gtl::LoadImageMat(path);
+		switch (img.channels()) {
+		case 3:
+			cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+			break;
+		case 4:
+			cv::cvtColor(img, img, cv::COLOR_BGRA2RGBA);
+			break;
+		}
+	}
+
+	ui.view->SetImage(img);
 }
 
 void xFindDuplicatesDlg::OnTimerUI_Timeout() {

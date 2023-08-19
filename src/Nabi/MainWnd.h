@@ -36,6 +36,9 @@ public:
 protected:
 	bool SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option);
 
+public:
+	bool UseFreeImage() const { return ui.chkUseFreeImage->isChecked(); }
+
 protected:
 	// slots
 	//void OnFolder_Activated(const QModelIndex &index);

@@ -36,6 +36,7 @@ protected:
 	void OnToolBrowse_Clicked(bool checked = false);
 	void OnBtnFindDuplicates_Clicked();
 	void OnBtnDeleteDuplicates_Clicked();
+	void OnTreeFiles_CurrentChanged(QModelIndex const &current, QModelIndex const& previous);
 	void OnTimerUI_Timeout();
 
 private:

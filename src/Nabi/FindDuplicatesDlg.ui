@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>742</width>
-    <height>462</height>
+    <width>750</width>
+    <height>391</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QSplitter" name="splitter">
+    <widget class="QSplitter" name="splitter_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -45,7 +45,7 @@
       </property>
      </widget>
      <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -94,7 +94,13 @@
         </layout>
        </item>
        <item>
-        <widget class="QTreeView" name="treeFiles"/>
+        <widget class="QSplitter" name="splitter">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QTreeView" name="treeFiles"/>
+         <widget class="gtl::qt::xMatView" name="view" native="true"/>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -107,7 +113,13 @@
   <customwidget>
    <class>gtl::qt::QColorButton</class>
    <extends>QPushButton</extends>
-   <header location="global">gtl/qt/QColorButton.h</header>
+   <header>gtl/qt/QColorButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>gtl::qt::xMatView</class>
+   <extends>QWidget</extends>
+   <header location="global">gtl/qt/MatView/MatView.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
