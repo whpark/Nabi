@@ -428,34 +428,43 @@ void xMainWnd::OnImage_Split() {
 	}
 
 	QMessageBox::information(this, "Done", std::format("{} images saved", nImage).c_str());
-
 }
 
 void xMainWnd::OnImage_RotateLeft() {
+	if (m_img.empty())
+		return;
 	xWaitCursor wc;
 	cv::flip(m_img.t(), m_img, 0);
 	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_RotateRight() {
+	if (m_img.empty())
+		return;
 	xWaitCursor wc;
 	cv::flip(m_img.t(), m_img, 1);
 	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_Rotate180() {
+	if (m_img.empty())
+		return;
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, -1);
 	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_FlipLR() {
+	if (m_img.empty())
+		return;
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, 1);
 	ui.view->SetImage(m_img, false);
 }
 
 void xMainWnd::OnImage_FlipUD() {
+	if (m_img.empty())
+		return;
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, 0);
 	ui.view->SetImage(m_img, false);
