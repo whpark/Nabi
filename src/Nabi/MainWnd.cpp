@@ -55,14 +55,14 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	}
 	ui.folder->setColumnWidth(0, 300);
 
-	// Image View
-	//bool(bool bStore, std::string_view cookie, S_OPTION&);
-	{
-		// 처음 실행시에만 설정. 초기값만... 두 번째 실행부터는 레지스트리에서 읽어옴.
-		auto option = ui.view->GetOption();
-		option.eZoomOut = xMatView::eZOOM_OUT::nearest;
-		ui.view->SetOption(option, false);
-	}
+	//// Image View
+	////bool(bool bStore, std::string_view cookie, S_OPTION&);
+	//{
+	//	// 처음 실행시에만 설정. 초기값만... 두 번째 실행부터는 레지스트리에서 읽어옴.
+	//	auto option = ui.view->GetOption();
+	//	option.eZoomOut = xMatView::eZOOM_OUT::nearest;
+	//	ui.view->SetOption(option, false);
+	//}
 	ui.view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
 		if (bStore) {
 			std::string buffer = glz::write_json(option);
