@@ -83,6 +83,7 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 
 	ui.chkUseFreeImage->setChecked(m_reg.value("misc/useFreeImage", true).toBool());
 
+	m_dlgBlendTest.emplace(this);
 	m_dlgFindDuplicate.emplace(this);
 
 	// Connection
@@ -99,6 +100,7 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	connect(ui.btnFlipLR, &QPushButton::clicked, this, &this_t::OnImage_FlipLR);
 	connect(ui.btnFlipUD, &QPushButton::clicked, this, &this_t::OnImage_FlipUD);
 
+	connect(ui.btnBlend, &QPushButton::clicked, this, &this_t::OnBtnBlend_Clicked);
 	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &this_t::OnBtnFindDuplicates_Clicked);
 }
 
@@ -131,7 +133,8 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 
 	// Use FreeImage
 	while (ui.chkUseFreeImage->isChecked()) {
-		auto eFileType = FreeImage_GetFIFFromFilename(path.extension().string().c_str());
+		auto strExt = path.extension().string();
+		auto eFileType = FreeImage_GetFIFFromFilename(strExt.c_str());
 		if (eFileType == FIF_UNKNOWN)
 			break;
 
@@ -468,6 +471,13 @@ void xMainWnd::OnImage_FlipUD() {
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, 0);
 	ui.view->SetImage(m_img, false);
+}
+
+void xMainWnd::OnBtnBlend_Clicked() {
+	if (m_dlgBlendTest) {
+		m_dlgBlendTest->show();
+		m_dlgBlendTest->setFocus();
+	}
 }
 
 void xMainWnd::OnBtnFindDuplicates_Clicked() {

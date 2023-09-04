@@ -50,6 +50,9 @@
     <ClCompile Include="FindDuplicatesDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="BlendTestDlg.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWnd.ui">
@@ -65,6 +68,9 @@
       <Filter>code</Filter>
     </QtUic>
     <QtUic Include="FindDuplicatesDlg.ui">
+      <Filter>code</Filter>
+    </QtUic>
+    <QtUic Include="BlendTestDlg.ui">
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>
@@ -94,6 +100,9 @@
       <Filter>code</Filter>
     </QtMoc>
     <QtMoc Include="FindDuplicatesModel.h">
+      <Filter>code</Filter>
+    </QtMoc>
+    <QtMoc Include="BlendTestDlg.h">
       <Filter>code</Filter>
     </QtMoc>
   </ItemGroup>

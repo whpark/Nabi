@@ -3,6 +3,7 @@
 #include "QTreeViewEx.h"
 #include "ui_MainWnd.h"
 #include "BitmapSaveOption.h"
+#include "BlendTestDlg.h"
 #include "FindDuplicatesDlg.h"
 #include "gtl/qt/QPathCompleter.h"
 
@@ -22,6 +23,7 @@ protected:
 
 	std::optional<gtl::qt::QPathCompleter> m_completer;
 
+	std::optional<xBlendTestDlg> m_dlgBlendTest;
 	std::optional<xFindDuplicatesDlg> m_dlgFindDuplicate;
 
 public:
@@ -52,6 +54,7 @@ protected:
 	void OnImage_FlipLR();
 	void OnImage_FlipUD();
 
+	void OnBtnBlend_Clicked();
 	void OnBtnFindDuplicates_Clicked();
 
 protected:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>894</width>
-    <height>463</height>
+    <width>1009</width>
+    <height>482</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -145,6 +145,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnBlend">
+            <property name="text">
+             <string>Blend</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btnFindDuplicates">
@@ -369,12 +376,14 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>folder</tabstop>
-  <tabstop>btnAbout</tabstop>
-  <tabstop>chkUseFreeImage</tabstop>
-  <tabstop>btnFindDuplicates</tabstop>
   <tabstop>edtPath</tabstop>
   <tabstop>btnLoad</tabstop>
+  <tabstop>btnAbout</tabstop>
+  <tabstop>chkUseFreeImage</tabstop>
+  <tabstop>chkGPUEnabled</tabstop>
+  <tabstop>btnBlend</tabstop>
+  <tabstop>btnFindDuplicates</tabstop>
+  <tabstop>folder</tabstop>
   <tabstop>btnRotateLeft</tabstop>
   <tabstop>btnRotateRight</tabstop>
   <tabstop>btnRotate180</tabstop>
@@ -382,6 +391,7 @@
   <tabstop>btnFlipUD</tabstop>
   <tabstop>btnSave</tabstop>
   <tabstop>btnSplit</tabstop>
+  <tabstop>edtImageInfo</tabstop>
   <tabstop>view</tabstop>
  </tabstops>
  <resources>
