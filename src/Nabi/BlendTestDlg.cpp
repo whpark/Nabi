@@ -78,9 +78,11 @@ void xBlendTestDlg::OnBtnTest3() {
 
 	const char fontName[] = "C:\\Windows\\Fonts\\impact.ttf";//"ABeeZee-Regular.ttf";
 	const char* str =
-		"Hello Blend2D!\n"
-		"I'm a simple multiline text example\n"
-		"that uses GlyphBuffer and GlyphRun!";
+		//"Hello Blend2D!\n"
+		//"I'm a simple multiline text example\n"
+		//"that uses GlyphBuffer and GlyphRun!";
+		"123\n456\n789\n";
+		//"12";
 	BLRgba32 color(0xFFFFFFFFu);
 
 	BLFontFace face;
@@ -93,7 +95,7 @@ void xBlendTestDlg::OnBtnTest3() {
 	}
 
 	BLFont font;
-	font.createFromFace(face, 60.0f);
+	font.createFromFace(face, 20.0f);
 
 	BLGlyphBuffer gb;
 	BLTextMetrics tm;
@@ -101,8 +103,9 @@ void xBlendTestDlg::OnBtnTest3() {
 
 	auto t0 = std::chrono::high_resolution_clock::now();
 	auto str0 = str;
-	for (int i = 0; i < 10000; i ++) {
-		ctx.clearAll();
+	for (int i = 0, n = 4000; i < n; i ++) {
+		if (i == n-1)
+			ctx.clearAll();
 		str = str0;
 		double y = fm.ascent;
 		do {
