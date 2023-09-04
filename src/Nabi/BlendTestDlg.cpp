@@ -98,13 +98,13 @@ void xBlendTestDlg::OnBtnTest3() {
 	BLGlyphBuffer gb;
 	BLTextMetrics tm;
 	BLFontMetrics fm = font.metrics();
-	double y = 190 + fm.ascent;
 
-	ctx.clearAll();
 	auto t0 = std::chrono::high_resolution_clock::now();
 	auto str0 = str;
 	for (int i = 0; i < 10000; i ++) {
+		ctx.clearAll();
 		str = str0;
+		double y = fm.ascent;
 		do {
 			const char* nl = strchr(str, '\n');
 			gb.setUtf8Text(str,
