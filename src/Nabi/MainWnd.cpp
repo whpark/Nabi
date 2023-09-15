@@ -298,6 +298,9 @@ bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitma
 	if (img0.channels() == 3) {
 		cv::cvtColor(img0, img, cv::COLOR_BGR2RGB);
 	}
+	else if (img0.channels() == 4) {
+		cv::cvtColor(img0, img, cv::COLOR_BGRA2RGBA);
+	}
 	else {
 		img = img0;
 	}
@@ -398,33 +401,67 @@ void xMainWnd::OnImage_Split() {
 	auto const& page = dlg.GetPage();
 	if (page.cx <= 1 and page.cy <= 1)
 		return;
-	//auto const& interleave = dlg.m_interleave;
-	//bool bInterleave = interleave.bUse and ( (interleave.sizeFields.cx > 1) or (interleave.sizeFields.cy > 1) );
+	auto const& interleave = dlg.m_interleave;
+	bool bInterleave = interleave.bUse and ( (interleave.sizeFields.cx > 1) or (interleave.sizeFields.cy > 1) );
 	gtl::xSize2i size = dlg.m_size;
 	if (size.cx <= 0)
 		size.cx = m_img.cols;
 	if (size.cy <= 0)
 		size.cy = m_img.rows;
 
-	auto option = dlg.m_option;
+	cv::Mat img;
+	if (bInterleave)
+		img = cv::Mat::zeros(size.cy*page.cy, size.cx*page.cx, m_img.type());	// not img1.size().
+	else
+		img = m_img;		// alias
 	int nImage{};
-	for (int iy{}, y{}; y < m_img.rows; iy++, y += size.cy) {
-		for (int ix{}, x{}; x < m_img.cols; ix++, x += size.cx) {
+	if (interleave.bUse) {
+		cv::Mat img0 = m_img;	// alias
+
+		auto InterleaveRow = [](cv::Mat img0, cv::Mat& img, int nInterleave, int nPixelGroup, int sizePart) {
+			for (int y{}, y0{}; y < sizePart; y++) {
+				for (int y1{y*nPixelGroup}; y1 < img.rows; y1 += sizePart) {	// not img1.cols. img1.cols is not multiple of size.cx
+					if (y0+nPixelGroup-1 >= img0.rows)
+						break;
+					//img0.row(y0++).copyTo(img.row(y1+g));
+					cv::Rect r0(0, y0, img0.cols, nPixelGroup), r1(0, y1, img0.cols, nPixelGroup);
+					img0(r0).copyTo(img(r1));
+					y0+=nPixelGroup;
+				}
+			}
+		};
+
+		if (interleave.sizeFields.cx > 1 and interleave.sizeFields.cy > 1) {
+			InterleaveRow(img0, img, interleave.sizeFields.cy, interleave.sizePixelGroup.cy, size.cy);
+			cv::Mat imgT = img.t(), imgD = cv::Mat::zeros(size.cx*page.cx, size.cy*page.cy, img.type());
+			InterleaveRow(imgT, imgD, interleave.sizeFields.cx, interleave.sizePixelGroup.cx, size.cx);
+			img = imgD.t();
+		} else if (interleave.sizeFields.cy > 1) {
+			InterleaveRow(img0, img, interleave.sizeFields.cy, interleave.sizePixelGroup.cy, size.cy);
+		} else if (interleave.sizeFields.cx > 1) {
+			cv::Mat imgT = img0.t(), imgD = cv::Mat::zeros(size.cx*page.cx, size.cy*page.cy, img.type());
+			InterleaveRow(imgT, imgD, interleave.sizeFields.cx, interleave.sizePixelGroup.cx, size.cx);
+			img = imgD.t();
+		}
+	}
+
+	for (int iy{}, y{}; y < img.rows; iy++, y += size.cy) {
+		for (int ix{}, x{}; x < img.cols; ix++, x += size.cx) {
 			gtl::xRect2i rect{x, y, x + size.cx, y + size.cy};
-			if (rect.right > m_img.cols)
-				rect.right = m_img.cols;
-			if (rect.bottom > m_img.rows)
-				rect.bottom = m_img.rows;
-			cv::Mat imgPart((cv::Size)size, m_img.type());
-			auto roi = gtl::GetSafeROI((cv::Rect)rect, m_img.size());
-			m_img(roi).copyTo(imgPart(cv::Rect(0, 0, roi.width, roi.height)));
+			if (rect.right > img.cols)
+				rect.right = img.cols;
+			if (rect.bottom > img.rows)
+				rect.bottom = img.rows;
+			cv::Mat imgPart((cv::Size)size, img.type());
+			auto roi = gtl::GetSafeROI((cv::Rect)rect, img.size());
+			img(roi).copyTo(imgPart(cv::Rect(0, 0, roi.width, roi.height)));
 
 			std::filesystem::path path = dlg.m_path.parent_path();
 			path /= dlg.m_path.stem().wstring();
 			path += std::format(L"_x{:04d}y{:04d}", ix+1, iy+1);
 			path += dlg.m_path.extension().wstring();
 
-			if (!SaveImage(imgPart, path, option))
+			if (!SaveImage(imgPart, path, dlg.m_option))
 				return ;
 			nImage++;
 		}

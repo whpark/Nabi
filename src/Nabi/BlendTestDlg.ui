@@ -14,6 +14,33 @@
    <string>BlendTestDlg</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="3">
+    <widget class="QPushButton" name="btnTest4">
+     <property name="text">
+      <string>Test4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="btnTest3">
+     <property name="text">
+      <string>Test3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>506</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="0" column="1">
     <widget class="QPushButton" name="btnTest2">
      <property name="text">
@@ -28,28 +55,8 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>506</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0" colspan="4">
+   <item row="1" column="0" colspan="5">
     <widget class="gtl::qt::xMatView" name="widget" native="true"/>
-   </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="btnTest3">
-     <property name="text">
-      <string>Test3</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

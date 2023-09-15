@@ -9,6 +9,7 @@ xBlendTestDlg::xBlendTestDlg(QWidget* parent)
 	connect(ui.btnTest1, &QPushButton::clicked, this, &xBlendTestDlg::OnBtnTest1);
 	connect(ui.btnTest2, &QPushButton::clicked, this, &xBlendTestDlg::OnBtnTest2);
 	connect(ui.btnTest3, &QPushButton::clicked, this, &xBlendTestDlg::OnBtnTest3);
+	connect(ui.btnTest4, &QPushButton::clicked, this, &xBlendTestDlg::OnBtnTest4);
 }
 
 xBlendTestDlg::~xBlendTestDlg() {
@@ -133,4 +134,37 @@ void xBlendTestDlg::OnBtnTest3() {
 	//img.writeToData(data, BLImageCodec::)
 
 	img.writeToFile("C:\\Work\\Temp\\bl_sample_8.png");
+}
+
+void xBlendTestDlg::OnBtnTest4() {
+	{
+		cv::Mat img(1037, 1037, CV_8UC1);
+		auto* ptr = img.ptr<uchar>(0);
+		for (int x{}; x < img.cols; x++)
+			ptr[x] = x / 100;
+		for (int y{ 1 }, c{ 1 }; y < img.cols; y++, c++) {
+			img.row(y) = c;
+			if (c >= 100)
+				c = 0;
+		}
+		for (int y{}; y < img.rows - 1; y++)
+			img.at<uchar>(y + 1, 0) = (y / 100);
+		cv::imwrite("C:\\Work\\Temp\\split_1037_y.png", img);
+		cv::imwrite("C:\\Work\\Temp\\split_1037_x.png", img.t());
+	}
+	{
+		cv::Mat img(1080, 1080, CV_8UC1);
+		auto* ptr = img.ptr<uchar>(0);
+		for (int x{}; x < img.cols; x++)
+			ptr[x] = x / 100;
+		for (int y{ 1 }, c{ 1 }; y < img.cols; y++, c++) {
+			img.row(y) = c;
+			if (c >= 100)
+				c = 0;
+		}
+		for (int y{}; y < img.rows - 1; y++)
+			img.at<uchar>(y + 1, 0) = (y / 100);
+		cv::imwrite("C:\\Work\\Temp\\split_1080_y.png", img);
+		cv::imwrite("C:\\Work\\Temp\\split_1080_x.png", img.t());
+	}
 }

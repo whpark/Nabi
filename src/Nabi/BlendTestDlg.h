@@ -14,6 +14,7 @@ protected:
 	void OnBtnTest1();
 	void OnBtnTest2();
 	void OnBtnTest3();
+	void OnBtnTest4();
 
 private:
 	Ui::BlendTestDlgClass ui;

@@ -19,7 +19,7 @@ public:
 	sBitmapSaveOption m_option;
 
 	struct sInterleave {
-		bool bUse{};
+		bool bUse{true};
 		gtl::xSize2i sizeFields{1,1};
 		gtl::xSize2i sizePixelGroup{1,1};
 	} m_interleave;
@@ -29,6 +29,7 @@ public:
 	~xSplitImageDlg();
 
 	bool UpdateData(bool bSave);
+	bool VerifyData(bool bUpdateUI);
 
 	gtl::xSize2i GetPage() const {
 		return gtl::xSize2i{GetPageX(), GetPageY()};
