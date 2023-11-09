@@ -19,6 +19,7 @@ public:
 
 public:
 	bool Init();
+	std::filesystem::path m_folderCurrent;
 
 public:
 	QSettings& GetReg() { return m_reg; };

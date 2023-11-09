@@ -21,3 +21,6 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
+using gtl::qt::ToString;
+using gtl::qt::ToWString;
+using gtl::qt::ToQString;

@@ -53,6 +53,9 @@
     <ClCompile Include="BlendTestDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="palette.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWnd.ui">
@@ -117,6 +120,9 @@
       <Filter>code</Filter>
     </ClInclude>
     <ClInclude Include="BitmapSaveOption.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="palette.h">
       <Filter>code</Filter>
     </ClInclude>
   </ItemGroup>

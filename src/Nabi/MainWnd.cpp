@@ -5,6 +5,7 @@
 #include "AboutDlg.h"
 #include "BitmapSaveOptionDlg.h"
 #include "SplitImageDlg.h"
+#include "palette.h"
 
 #include "FreeImage.h"
 
@@ -21,14 +22,14 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	m_completer.emplace(this, std::filesystem::path{}, false);
 	ui.edtPath->setCompleter(&*m_completer);
 
-	if (s_palette_8bit.empty()) {
-		auto& pal = s_palette_8bit;
-		pal.reserve(256);
-		pal = s_palette_4bit;
-		for (size_t i = pal.size(); pal.size() < 256; i++) {
-			pal.push_back(gtl::color_bgra_t{(uint8_t)i, (uint8_t)i, (uint8_t)i});
-		}
-	}
+	//if (s_palette_8bit.empty()) {
+	//	auto& pal = s_palette_8bit;
+	//	pal.reserve(256);
+	//	pal = s_palette_4bit;
+	//	for (size_t i = pal.size(); pal.size() < 256; i++) {
+	//		pal.push_back(gtl::color_bgra_t{(uint8_t)i, (uint8_t)i, (uint8_t)i});
+	//	}
+	//}
 
 	// Application Icon
 	QIcon* icon = new QIcon(":/image/icon.png");
@@ -50,6 +51,12 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	auto strPath = m_reg.value(L"misc/LastImage").toString();
 	if (!strPath.isEmpty()) {
 		auto index = m_modelFileSystem.index(strPath).parent();
+		std::filesystem::path path = ToWString(strPath);
+		if (std::filesystem::is_directory(path))
+			theApp->m_folderCurrent = theApp->m_folderCurrent;
+		else
+			theApp->m_folderCurrent = path.parent_path();
+
 		ui.folder->setCurrentIndex(index);
 		ui.folder->expand(index);
 	}
@@ -113,10 +120,10 @@ xMainWnd::~xMainWnd() {
 
 bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	std::error_code ec;
+	if (!std::filesystem::is_regular_file(path, ec))
+		return false;
 	size_t sizeFile = std::filesystem::file_size(path, ec);
 	if (!sizeFile)
-		return false;
-	if (!std::filesystem::is_regular_file(path, ec))
 		return false;
 
 	m_reg.setValue("misc/useFreeImage", ui.chkUseFreeImage->isChecked());
@@ -310,11 +317,11 @@ bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitma
 	gtl::MakeLower(ext);
 	if ( (ext == ".bmp") and (img.channels() == 1) ) {
 
-		std::span<gtl::color_bgra_t> palette;
+		std::span<gtl::color_bgra_t const> palette;
 		switch (option.bpp) {
-		case sBitmapSaveOption::eBPP::_1: palette = s_palette_1bit; break;
-		case sBitmapSaveOption::eBPP::_4: palette = s_palette_4bit; break;
-		case sBitmapSaveOption::eBPP::_8: palette = s_palette_8bit; break;
+		case sBitmapSaveOption::eBPP::_1: palette = s_palette_1bit_bw; break;
+		case sBitmapSaveOption::eBPP::_4: palette = s_palette_4bit_grayscale; break;
+		case sBitmapSaveOption::eBPP::_8: palette = s_palette_8bit_grayscale; break;
 		}
 
 		// Save
@@ -339,8 +346,15 @@ void xMainWnd::OnFolder_SelChanged() {
 	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
 	if (path.empty())
 		return;
-	if (!ShowImage(path))
-		ui.view->SetImage({});
+
+	if (std::filesystem::is_directory(path)) {
+		theApp->m_folderCurrent = path;
+	}
+	else {
+		theApp->m_folderCurrent = path.parent_path();
+		if (!ShowImage(path))
+			ui.view->SetImage({});
+	}
 }
 
 void xMainWnd::OnImage_Load() {

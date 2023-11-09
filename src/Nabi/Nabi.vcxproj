@@ -145,6 +145,7 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
     </ClCompile>
     <ClCompile Include="FindDuplicatesModel.cpp" />
     <ClCompile Include="FolderSystemModel.cpp" />
+    <ClCompile Include="palette.cpp" />
     <ClCompile Include="QTreeViewEx.cpp" />
     <ClCompile Include="BitmapSaveOptionDlg.cpp" />
     <ClCompile Include="SplitImageDlg.cpp" />
@@ -158,6 +159,7 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
     <QtMoc Include="FolderSystemModel.h" />
     <QtMoc Include="FindDuplicatesModel.h" />
     <QtMoc Include="BlendTestDlg.h" />
+    <ClInclude Include="palette.h" />
     <ClInclude Include="resource.h" />
     <QtRcc Include="resource.qrc" />
     <QtUic Include="AboutDlg.ui" />
