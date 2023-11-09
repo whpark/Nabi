@@ -52,7 +52,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1905F4C840154E4C94657AA27F08B0AB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1945D966654146CE99EFF5F079EC9261"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1BA26A16E99D49AB9A53282243D30709"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -95,6 +107,12 @@
         "Entry"
         {
         "MsmKey" = "8:_3937CB38D5134F889A49F83C2A469E7E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_39B3528883F1440FAE8007377D5E4E6B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -167,6 +185,12 @@
         "Entry"
         {
         "MsmKey" = "8:_931D68B50544451E9CCD4647088B62FE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_93663BB917BE4D308EAC7AEA1B61FE55"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -551,10 +575,50 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1905F4C840154E4C94657AA27F08B0AB"
+            {
+            "SourcePath" = "8:..\\x64\\Release\\opencv_cudafilters4.dll"
+            "TargetName" = "8:opencv_cudafilters4.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1945D966654146CE99EFF5F079EC9261"
             {
             "SourcePath" = "8:C:\\DevTools\\QT\\6.5.2\\bin\\libprotobuf.dll"
             "TargetName" = "8:libprotobuf.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1BA26A16E99D49AB9A53282243D30709"
+            {
+            "SourcePath" = "8:..\\x64\\Release\\opencv_cudaarithm4.dll"
+            "TargetName" = "8:opencv_cudaarithm4.dll"
             "Tag" = "8:"
             "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
             "Condition" = "8:"
@@ -695,6 +759,26 @@
             {
             "SourcePath" = "8:C:\\DevTools\\QT\\6.5.2\\bin\\zstd.dll"
             "TargetName" = "8:zstd.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_39B3528883F1440FAE8007377D5E4E6B"
+            {
+            "SourcePath" = "8:..\\x64\\Release\\opencv_cudaimgproc4.dll"
+            "TargetName" = "8:opencv_cudaimgproc4.dll"
             "Tag" = "8:"
             "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
             "Condition" = "8:"
@@ -937,6 +1021,26 @@
             "TargetName" = "8:qdirect2d.dll"
             "Tag" = "8:"
             "Folder" = "8:_02C1305DEC2A4C2783EDCD21FB00C68A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_93663BB917BE4D308EAC7AEA1B61FE55"
+            {
+            "SourcePath" = "8:..\\x64\\Release\\opencv_cudawarping4.dll"
+            "TargetName" = "8:opencv_cudawarping4.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1590,7 +1694,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Nabi"
         "ProductCode" = "8:{D0ADED9A-50E6-4D19-B497-4BD2A866EF22}"
-        "PackageCode" = "8:{EF8B28DE-F7F7-4978-AD75-2F2CEBEC71FB}"
+        "PackageCode" = "8:{662463EF-FF7D-45B4-821E-B60759935F54}"
         "UpgradeCode" = "8:{7392F085-F3D1-491A-9793-28B5249C5126}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"

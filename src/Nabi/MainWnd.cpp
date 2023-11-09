@@ -15,7 +15,7 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 
     ui.setupUi(this);
 
-	ui.chkGPUEnabled->setChecked(gtl::CheckGPU(false) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+	ui.chkGPUEnabled->setChecked(gtl::CheckGPU(true) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 	ui.chkGPUEnabled->setEnabled(false);
 
 	// QCompleter for ui.edtPath
