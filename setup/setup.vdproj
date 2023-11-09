@@ -22,12 +22,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_096C61BB70914D459FAE613AF5EECD8D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0A6E94661D4E07D446DB86687814B0A2"
         "OwnerKey" = "8:_A89D39E45FD04BB5903F4A2EA7591872"
         "MsmSig" = "8:_UNDEFINED"
@@ -64,8 +58,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1DDCEDBBF12F446F895C1E06355F960C"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_1D829D52BDC36E5F6D8D663FB71E8FD5"
+        "OwnerKey" = "8:_A89D39E45FD04BB5903F4A2EA7591872"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -258,18 +252,6 @@
         {
         "MsmKey" = "8:_C0CE331F955D0EC02B03F7E307296114"
         "OwnerKey" = "8:_A89D39E45FD04BB5903F4A2EA7591872"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C1EF8184962C44998E9B3FC595B925E9"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C3A77DCA8AAC4C3FA5614D7BEAC3561B"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -469,26 +451,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_096C61BB70914D459FAE613AF5EECD8D"
-            {
-            "SourcePath" = "8:..\\x64\\Release\\opencv_cudaimgproc4.dll"
-            "TargetName" = "8:opencv_cudaimgproc4.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0A6E94661D4E07D446DB86687814B0A2"
             {
             "SourcePath" = "8:api-ms-win-crt-math-l1-1-0.dll"
@@ -609,10 +571,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1DDCEDBBF12F446F895C1E06355F960C"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1D829D52BDC36E5F6D8D663FB71E8FD5"
             {
-            "SourcePath" = "8:..\\x64\\Release\\opencv_cudafilters4.dll"
-            "TargetName" = "8:opencv_cudafilters4.dll"
+            "SourcePath" = "8:api-ms-win-crt-time-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-time-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
             "Condition" = "8:"
@@ -626,7 +588,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_243A4093464B425CB07F9D003307823D"
@@ -1249,46 +1211,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C1EF8184962C44998E9B3FC595B925E9"
-            {
-            "SourcePath" = "8:..\\x64\\Release\\opencv_cudaarithm4.dll"
-            "TargetName" = "8:opencv_cudaarithm4.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C3A77DCA8AAC4C3FA5614D7BEAC3561B"
-            {
-            "SourcePath" = "8:..\\x64\\Release\\opencv_cudawarping4.dll"
-            "TargetName" = "8:opencv_cudawarping4.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C5E29EB9F5DF7F545F5C9135EC79F670"
             {
             "SourcePath" = "8:api-ms-win-crt-string-l1-1-0.dll"
@@ -1667,15 +1589,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Nabi"
-        "ProductCode" = "8:{15C0F12B-9218-40A2-916E-52ED02479803}"
-        "PackageCode" = "8:{1FD504D4-682E-416F-B838-8C38A1876E3D}"
+        "ProductCode" = "8:{D0ADED9A-50E6-4D19-B497-4BD2A866EF22}"
+        "PackageCode" = "8:{711DE197-9722-4744-AD84-2AD8CD8B5FDA}"
         "UpgradeCode" = "8:{7392F085-F3D1-491A-9793-28B5249C5126}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.10"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:Biscuit-lab"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://biscuit-lab.com"
