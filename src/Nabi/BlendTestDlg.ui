@@ -328,15 +328,22 @@
  </customwidgets>
  <tabstops>
   <tabstop>spinImageWidth</tabstop>
+  <tabstop>spinImageHeight</tabstop>
+  <tabstop>chkColorImage</tabstop>
   <tabstop>cmbBPP</tabstop>
   <tabstop>cmbPattern</tabstop>
   <tabstop>spinPaletteIndex</tabstop>
+  <tabstop>txtImageValue</tabstop>
   <tabstop>grpMarks</tabstop>
+  <tabstop>spinFontScale</tabstop>
+  <tabstop>spinFontThickness</tabstop>
   <tabstop>chkIgnorePalette</tabstop>
   <tabstop>btnMakeImage</tabstop>
   <tabstop>btnSaveImageAs</tabstop>
   <tabstop>btnTest1</tabstop>
+  <tabstop>btnTest2</tabstop>
   <tabstop>btnTest3</tabstop>
+  <tabstop>btnTest4</tabstop>
  </tabstops>
  <resources/>
  <connections/>

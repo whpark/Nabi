@@ -64,8 +64,6 @@ void xBlendTestDlg::OnBtnMakeImage() {
 
 	// Save parameters
 	auto const o = UpdateData<true>();
-	std::string buffer = glz::write_json(m_optionLast);
-	theApp->GetReg().setValue("TestImage/option", ToQString(buffer));
 
 	int nBPP = sBitmapSaveOption::GetBPP(o.bpp);
 	if (o.index >= (1 << nBPP)) {
@@ -165,6 +163,8 @@ void xBlendTestDlg::OnBtnMakeImage() {
 		}
 	}
 	m_optionLast = o;
+	std::string buffer = glz::write_json(m_optionLast);
+	theApp->GetReg().setValue("TestImage/option", ToQString(buffer));
 	ui.view->SetImage(m_imgLast);
 }
 
