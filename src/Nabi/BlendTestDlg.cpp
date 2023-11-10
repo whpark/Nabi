@@ -33,6 +33,12 @@ xBlendTestDlg::xBlendTestDlg(QWidget* parent)
 		auto option = ui.view->GetOption();
 		option.crBackground = cv::Vec3b(20, 10, 60);
 		ui.view->SetOption(option, false);
+
+		ui.view->m_strCookie = "TestImage/viewOption";
+		ui.view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, gtl::qt::xMatView::S_OPTION& option) -> bool {
+			return SyncOption(theApp->GetReg(), bStore, cookie, option);
+		};
+		ui.view->LoadOption();
 	}
 
 	// parameters
@@ -49,6 +55,16 @@ xBlendTestDlg::xBlendTestDlg(QWidget* parent)
 	connect(ui.cmbBPP, &QComboBox::currentTextChanged, this, &xBlendTestDlg::UpdateImageValue);
 	connect(ui.chkColorImage, &QCheckBox::clicked, this, [this](auto) { UpdateImageValue(); });
 	connect(ui.spinPaletteIndex, &QSpinBox::valueChanged, this, [this](auto) { UpdateImageValue(); });
+	connect(ui.btnDPItoPelsPerMeterX, &QToolButton::clicked, this, [this](auto) {
+		ui.spinPelsPerMeterX->setValue(ui.spinTargetDPIX->value() * 1'000 / 25.4);
+	});
+	connect(ui.btnDPItoPelsPerMeterY, &QToolButton::clicked, this, [this](auto) {
+		ui.spinPelsPerMeterY->setValue(ui.spinTargetDPIY->value() * 1'000 / 25.4);
+	});
+	connect(ui.spinPelsPerMeterX, &QSpinBox::valueChanged, this, &xBlendTestDlg::UpdateDPI);
+	connect(ui.spinPelsPerMeterY, &QSpinBox::valueChanged, this, &xBlendTestDlg::UpdateDPI);
+	connect(ui.spinTargetDPIX, &QSpinBox::valueChanged, [this](auto) { emit ui.btnDPItoPelsPerMeterX->clicked(); });
+	connect(ui.spinTargetDPIY, &QSpinBox::valueChanged, [this](auto) { emit ui.btnDPItoPelsPerMeterY->clicked(); });
 
 	connect(ui.btnTest1, &QPushButton::clicked, this, &xBlendTestDlg::OnBtnTest1);
 	connect(ui.btnTest2, &QPushButton::clicked, this, &xBlendTestDlg::OnBtnTest2);
@@ -185,7 +201,7 @@ void xBlendTestDlg::OnBtnSaveImageAs() {
 bool xBlendTestDlg::SaveImage(cv::Mat img, std::filesystem::path const& path, sOption const& o) {
 	int nBPP = sBitmapSaveOption::GetBPP(o.bpp);
 	auto palette = GetPalette(nBPP, o.bColorImage);
-	gtl::xSize2i pelsPerMeter;
+	gtl::xSize2i pelsPerMeter{ o.pelsPerMeterX, o.pelsPerMeterY };
 	return gtl::SaveBitmapMat(path, img, nBPP, pelsPerMeter, palette, true, false);
 }
 
@@ -242,6 +258,14 @@ void xBlendTestDlg::UpdateImageValue() {
 	else {
 		ui.txtImageValue->setText("N/A");
 	}
+}
+
+void xBlendTestDlg::UpdateDPI() {
+	auto pelsPerMeterX = ui.spinPelsPerMeterX->value();
+	auto pelsPerMeterY = ui.spinPelsPerMeterY->value();
+	auto dpiX = pelsPerMeterX * 25.4 / 1000;
+	auto dpiY = pelsPerMeterY * 25.4 / 1000;
+	ui.txtDPI->setText(ToQString(fmt::format("dpi ({:.2f}, {:.2f}), DtoD ({:.2f}, {:.2f}) um", dpiX, dpiY, 1'000'000. / pelsPerMeterX, 1'000'000. / pelsPerMeterY)));
 }
 
 void xBlendTestDlg::OnBtnTest1() {

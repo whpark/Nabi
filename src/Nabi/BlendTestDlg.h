@@ -20,7 +20,9 @@ public:
 		double dFontScale{1.0};
 		int iFontThickness{1};
 
-		GLZ_LOCAL_META(sOption, width, height, bpp, bColorImage, ePattern, index, bMark, dFontScale, iFontThickness);
+		int pelsPerMeterX{ gtl::Round(360 * 1'000 / 25.4) }, pelsPerMeterY{ gtl::Round(360 * 1'000 / 25.4) };
+
+		GLZ_LOCAL_META(sOption, width, height, bpp, bColorImage, ePattern, index, bMark, dFontScale, iFontThickness, pelsPerMeterX, pelsPerMeterY);
 	};
 
 public:
@@ -40,6 +42,16 @@ public:
 		UpdateWidgetValue(bSave, ui.grpMarks, option.bMark);
 		UpdateWidgetValue(bSave, ui.spinFontScale, option.dFontScale);
 		UpdateWidgetValue(bSave, ui.spinFontThickness, option.iFontThickness);
+		UpdateWidgetValue(bSave, ui.spinPelsPerMeterX, option.pelsPerMeterX);
+		UpdateWidgetValue(bSave, ui.spinPelsPerMeterY, option.pelsPerMeterY);
+
+		if constexpr (bSave) {
+
+		}
+		else {
+			UpdateImageValue();
+			UpdateDPI();
+		}
 
 		return option;
 	}
@@ -56,6 +68,7 @@ protected:
 	std::optional<gtl::color_bgra_t> GetImageValue(std::optional<int> index = {}, std::optional<int> bpp ={}, std::optional<bool> bColorImage ={});
 	std::span<gtl::color_bgra_t const> GetPalette(std::optional<int> bpp = {}, std::optional<bool> bGrayscale = {});
 	void UpdateImageValue();
+	void UpdateDPI();
 
 	void OnBtnTest1();
 	void OnBtnTest2();

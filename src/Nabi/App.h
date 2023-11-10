@@ -29,3 +29,19 @@ public:
 
 //---------------------------------------------------------------------------------------------------------------------------------
 extern std::optional<xApp> theApp;
+
+template < typename tOption >
+bool SyncOption(QSettings& reg, bool bStore, std::string_view cookie, tOption& option) {
+	if (bStore) {
+		std::string buffer = glz::write_json(option);
+		reg.setValue(cookie, ToQString(buffer));
+	}
+	else {
+		auto str = reg.value(cookie).toString();
+		if (str.isEmpty())
+			return false;
+		auto buffer = ToString(str);
+		auto err = glz::read_json(option, buffer);
+	}
+	return true;
+};

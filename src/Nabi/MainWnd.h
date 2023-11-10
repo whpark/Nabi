@@ -27,7 +27,7 @@ protected:
 	std::optional<xFindDuplicatesDlg> m_dlgFindDuplicate;
 
 public:
-	QSettings m_reg { "Biscuit-lab", "Nabi" };
+	QSettings& m_reg;
 
 public:
 	xMainWnd(QWidget* parent = nullptr);

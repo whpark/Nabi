@@ -11,7 +11,7 @@
 
 using namespace gtl::qt;
 
-xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
+xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 
     ui.setupUi(this);
 
@@ -70,28 +70,32 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent) {
 	//	option.eZoomOut = xMatView::eZOOM_OUT::nearest;
 	//	ui.view->SetOption(option, false);
 	//}
+	ui.view->m_strCookie = "misc/viewOption";
 	ui.view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
-		if (bStore) {
-			std::string buffer = glz::write_json(option);
-			m_reg.setValue("misc/viewOption", ToQString(buffer));
-		}
-		else {
-			auto str = m_reg.value("misc/viewOption").toString();
-			if (str.isEmpty())
-				return false;
-			auto buffer = ToString(str);
-			auto err = glz::read_json(option, buffer);
-			//if (err)
-			//	return false;
-		}
-		return true;
+		return SyncOption<xMatView::S_OPTION>(m_reg, bStore, cookie, option);
 	};
+	//ui.view->m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
+	//	if (bStore) {
+	//		std::string buffer = glz::write_json(option);
+	//		m_reg.setValue("misc/viewOption", ToQString(buffer));
+	//	}
+	//	else {
+	//		auto str = m_reg.value("misc/viewOption").toString();
+	//		if (str.isEmpty())
+	//			return false;
+	//		auto buffer = ToString(str);
+	//		auto err = glz::read_json(option, buffer);
+	//		//if (err)
+	//		//	return false;
+	//	}
+	//	return true;
+	//};
 	ui.view->LoadOption();
 
 	ui.chkUseFreeImage->setChecked(m_reg.value("misc/useFreeImage", true).toBool());
 
-	m_dlgBlendTest.emplace(this);
-	m_dlgFindDuplicate.emplace(this);
+	//m_dlgBlendTest.emplace(this);
+	//m_dlgFindDuplicate.emplace(this);
 
 	// Connection
 	connect(ui.btnAbout, &QPushButton::clicked, this, [this](auto) { xAboutDlg dlg(this); dlg.exec(); });
@@ -525,15 +529,15 @@ void xMainWnd::OnImage_FlipUD() {
 }
 
 void xMainWnd::OnBtnBlend_Clicked() {
-	if (m_dlgBlendTest) {
-		m_dlgBlendTest->show();
-		m_dlgBlendTest->setFocus();
-	}
+	if (!m_dlgBlendTest)
+		m_dlgBlendTest.emplace(this);
+	m_dlgBlendTest->show();
+	m_dlgBlendTest->setFocus();
 }
 
 void xMainWnd::OnBtnFindDuplicates_Clicked() {
-	if (m_dlgFindDuplicate) {
-		m_dlgFindDuplicate->show();
-		m_dlgFindDuplicate->setFocus();
-	}
+	if (!m_dlgFindDuplicate)
+		m_dlgFindDuplicate.emplace(this);
+	m_dlgFindDuplicate->show();
+	m_dlgFindDuplicate->setFocus();
 }
