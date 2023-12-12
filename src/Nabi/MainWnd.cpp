@@ -113,6 +113,8 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 
 	connect(ui.btnBlend, &QPushButton::clicked, this, &this_t::OnBtnBlend_Clicked);
 	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &this_t::OnBtnFindDuplicates_Clicked);
+
+	connect(ui.btnPixelCount, &QPushButton::clicked, this, &this_t::OnBtnPixelCount_Clicked);
 }
 
 xMainWnd::~xMainWnd() {
@@ -540,4 +542,36 @@ void xMainWnd::OnBtnFindDuplicates_Clicked() {
 		m_dlgFindDuplicate.emplace(this);
 	m_dlgFindDuplicate->show();
 	m_dlgFindDuplicate->setFocus();
+}
+
+void xMainWnd::OnBtnPixelCount_Clicked() {
+	if (m_img.channels() != 1)
+		return;
+
+	cv::Mat img;
+	if (auto rect = ui.view->GetSelectionRect()) {
+		auto roi = gtl::GetSafeROI(cv::Rect(*rect), m_img.size());
+		img = m_img(roi);
+	}
+	else {
+		img = m_img;
+	}
+
+	int channels[] = {0};
+	int histSize[] = {256};
+	cv::MatND matHist;
+	float sranges[] = { 0, 256 };
+	const float* ranges[] = { sranges };
+	cv::calcHist(&img, 1, channels, cv::Mat(), matHist, 1, histSize, ranges);
+	std::wstring str;
+	for (int i{}; i < matHist.rows; i++) {
+		if (matHist.at<float>(i, 0) > 0) {
+			// add locale en_US.utf8
+			str += fmt::format(L"Value {} : ", i);
+			str += gtl::AddThousandComma<wchar_t>(std::format(L"{}", (int)matHist.at<float>(i, 0)));
+			str += L"\n";
+		}
+	}
+	QMessageBox::information(this, "Color Count", ToQString(str));
+
 }

@@ -1381,15 +1381,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Nabi"
-        "ProductCode" = "8:{E6A86093-12B2-4188-91F5-400898A27164}"
-        "PackageCode" = "8:{9D093C29-1D2D-49D5-BE69-69FA046299F4}"
+        "ProductCode" = "8:{702E73F1-88B5-46CC-8A66-6ABBBB9C671E}"
+        "PackageCode" = "8:{586AC1C8-C7C1-4630-9EAF-A19E2C39A061}"
         "UpgradeCode" = "8:{7392F085-F3D1-491A-9793-28B5249C5126}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.1.1"
+        "ProductVersion" = "8:1.1.2"
         "Manufacturer" = "8:Biscuit-lab"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://biscuit-lab.com"
@@ -1931,7 +1931,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A89D39E45FD04BB5903F4A2EA7591872"
             {
-            "SourcePath" = "8:..\\x64\\Debug\\Nabi.exe"
+            "SourcePath" = "8:..\\x64\\Release\\Nabi.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7977CAACA68040CAADD4B082A726F271"

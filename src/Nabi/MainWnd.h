@@ -56,6 +56,7 @@ protected:
 
 	void OnBtnBlend_Clicked();
 	void OnBtnFindDuplicates_Clicked();
+	void OnBtnPixelCount_Clicked();
 
 private:
 	Ui::MainWndClass ui;
