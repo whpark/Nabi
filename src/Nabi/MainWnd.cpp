@@ -545,9 +545,12 @@ void xMainWnd::OnBtnFindDuplicates_Clicked() {
 }
 
 void xMainWnd::OnBtnPixelCount_Clicked() {
-	if (m_img.channels() != 1)
+	if (m_img.channels() != 1) {
+		QMessageBox::warning(this, "Pixel Count", "only supports single channel image");
 		return;
+	}
 
+	xWaitCursor wc;
 	cv::Mat img;
 	if (auto rect = ui.view->GetSelectionRect()) {
 		auto roi = gtl::GetSafeROI(cv::Rect(*rect), m_img.size());
