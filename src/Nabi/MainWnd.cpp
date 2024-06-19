@@ -15,6 +15,8 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 
     ui.setupUi(this);
 
+	setAcceptDrops(true);
+
 	ui.chkGPUEnabled->setChecked(gtl::CheckGPU(false) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 	ui.chkGPUEnabled->setEnabled(false);
 
@@ -347,6 +349,34 @@ bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitma
 	return true;
 }
 
+void xMainWnd::dragEnterEvent(QDragEnterEvent* event) {
+	if (event->mimeData()->hasUrls())
+		event->acceptProposedAction();
+}
+
+void xMainWnd::dragMoveEvent(QDragMoveEvent* event) {
+}
+
+void xMainWnd::dragLeaveEvent(QDragLeaveEvent* event) {
+}
+
+void xMainWnd::dropEvent(QDropEvent* event) {
+	const QMimeData* mimeData = event->mimeData();
+
+	// check for our needed mime type, here a file or a list of files
+	if (!mimeData->hasUrls())
+		return;
+
+	QStringList pathList;
+	QList<QUrl> urlList = mimeData->urls();
+	if (urlList.empty())
+		return;
+
+	auto path = urlList[0].toLocalFile();
+	ui.edtPath->setText(path);
+	OnImage_Load();
+}
+
 void xMainWnd::OnFolder_SelChanged() {
 	auto index = ui.folder->currentIndex();
 	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
@@ -493,6 +523,14 @@ void xMainWnd::OnImage_Split() {
 void xMainWnd::OnImage_RotateLeft() {
 	if (m_img.empty())
 		return;
+	//if (ui.chkUseFreeImage->isChecked()) {
+	//	auto index = ui.folder->currentIndex();
+	//	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
+	//	if (path.empty())
+	//		return;
+	//	//FreeImage_Load();
+	//	return;
+	//}
 	xWaitCursor wc;
 	cv::flip(m_img.t(), m_img, 0);
 	ui.view->SetImage(m_img, false);
@@ -545,6 +583,8 @@ void xMainWnd::OnBtnFindDuplicates_Clicked() {
 }
 
 void xMainWnd::OnBtnPixelCount_Clicked() {
+	if (m_img.empty())
+		return;
 	if (m_img.channels() != 1) {
 		QMessageBox::warning(this, "Pixel Count", "only supports single channel image");
 		return;

@@ -38,6 +38,12 @@ public:
 protected:
 	bool SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option);
 
+protected:	// drag & drop
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dragMoveEvent(QDragMoveEvent* event) override;
+	void dragLeaveEvent(QDragLeaveEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
+
 public:
 	bool UseFreeImage() const { return ui.chkUseFreeImage->isChecked(); }
 
