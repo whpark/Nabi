@@ -31,6 +31,20 @@ bool xApp::Init() {
 	setStyle("fusion");
 	std::this_thread::sleep_for(100ms);
 
+	QSurfaceFormat format;
+	format.setVersion(3, 3);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+
+	// QOpenGLContext 생성
+	QOpenGLContext context;
+	context.setFormat(format);
+	if (context.create()) {
+	}
+	else {
+		QMessageBox::critical(nullptr, "Error", "Failed to create OpenGL context.");
+		return false;
+	}
+
 	m_wndMain = std::make_unique<xMainWnd>();
 	m_wndMain->show();
 
