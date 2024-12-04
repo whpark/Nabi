@@ -33,8 +33,11 @@ extern std::optional<xApp> theApp;
 template < typename tOption >
 bool SyncOption(QSettings& reg, bool bStore, std::string_view cookie, tOption& option) {
 	if (bStore) {
-		std::string buffer = glz::write_json(option);
-		reg.setValue(cookie, ToQString(buffer));
+		if (auto r = glz::write_json(option)) {
+			reg.setValue(cookie, ToQString(*r));
+			return true;
+		}
+		return false;
 	}
 	else {
 		auto str = reg.value(cookie).toString();
@@ -42,6 +45,6 @@ bool SyncOption(QSettings& reg, bool bStore, std::string_view cookie, tOption& o
 			return false;
 		auto buffer = ToString(str);
 		auto err = glz::read_json(option, buffer);
+		return true;
 	}
-	return true;
 };

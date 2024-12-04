@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "App.h"
 #include "BlendTestDlg.h"
 #include "blend2d.h"
@@ -179,7 +179,7 @@ void xBlendTestDlg::OnBtnMakeImage() {
 		}
 	}
 	m_optionLast = o;
-	std::string buffer = glz::write_json(m_optionLast);
+	std::string buffer = glz::write_json(m_optionLast).value_or("");
 	theApp->GetReg().setValue("TestImage/option", ToQString(buffer));
 	ui.view->SetImage(m_imgLast);
 }

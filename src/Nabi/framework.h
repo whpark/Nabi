@@ -11,7 +11,7 @@
 #include "gtl/qt/MatBitmapArchive.h"
 #include "gtl/qt/ProgressDlg.h"
 
-#include "opencv2/core/utility.hpp"
+#include "opencv2/opencv.hpp"
 
 #include <QtWidgets>
 #include <QtWidgets/QApplication>

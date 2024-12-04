@@ -32,12 +32,12 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>QT_6.5.2</QtInstall>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
     <QtModules>core;gui;widgets;opengl;openglwidgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>QT_6.5.2</QtInstall>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
     <QtModules>core;gui;widgets;opengl;openglwidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -74,6 +74,10 @@
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BuildStlModules>false</BuildStlModules>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -91,6 +95,7 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BuildStlModules>false</BuildStlModules>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(PathGTL)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -103,7 +108,6 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -120,7 +124,6 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ClCompile>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
