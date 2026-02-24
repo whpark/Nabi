@@ -112,6 +112,7 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 	connect(ui.btnRotate180, &QPushButton::clicked, this, &this_t::OnImage_Rotate180);
 	connect(ui.btnFlipLR, &QPushButton::clicked, this, &this_t::OnImage_FlipLR);
 	connect(ui.btnFlipUD, &QPushButton::clicked, this, &this_t::OnImage_FlipUD);
+	connect(ui.btnTest, &QPushButton::clicked, this, &this_t::OnImage_Test);
 
 	connect(ui.btnBlend, &QPushButton::clicked, this, &this_t::OnBtnBlend_Clicked);
 	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &this_t::OnBtnFindDuplicates_Clicked);
@@ -565,6 +566,15 @@ void xMainWnd::OnImage_FlipUD() {
 		return;
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, 0);
+	ui.view->SetImage(m_img, false);
+}
+
+void xMainWnd::OnImage_Test() {
+	if (m_img.empty())
+		return;
+	xWaitCursor wc;
+	//cv::threshold(m_img, m_img, 254, 128, cv::ThresholdTypes::THRESH_BINARY_INV);
+	cv::threshold(m_img, m_img, 128, 128, cv::ThresholdTypes::THRESH_TRUNC);
 	ui.view->SetImage(m_img, false);
 }
 

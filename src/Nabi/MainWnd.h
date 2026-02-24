@@ -60,6 +60,8 @@ protected:
 	void OnImage_FlipLR();
 	void OnImage_FlipUD();
 
+	void OnImage_Test();
+
 	void OnBtnBlend_Clicked();
 	void OnBtnFindDuplicates_Clicked();
 	void OnBtnPixelCount_Clicked();
