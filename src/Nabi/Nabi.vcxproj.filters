@@ -32,9 +32,6 @@
     <ClCompile Include="AboutDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
-    <ClCompile Include="QTreeViewEx.cpp">
-      <Filter>code</Filter>
-    </ClCompile>
     <ClCompile Include="BitmapSaveOptionDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
@@ -82,9 +79,6 @@
       <Filter>code</Filter>
     </QtMoc>
     <QtMoc Include="AboutDlg.h">
-      <Filter>code</Filter>
-    </QtMoc>
-    <QtMoc Include="QTreeViewEx.h">
       <Filter>code</Filter>
     </QtMoc>
     <QtMoc Include="BitmapSaveOptionDlg.h">

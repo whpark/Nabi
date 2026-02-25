@@ -149,13 +149,11 @@ xcopy /dy $(PathGTL)\bin\gtl.win.x$(PlatformArchitecture)$(Configuration[0]).dll
     <ClCompile Include="FindDuplicatesModel.cpp" />
     <ClCompile Include="FolderSystemModel.cpp" />
     <ClCompile Include="palette.cpp" />
-    <ClCompile Include="QTreeViewEx.cpp" />
     <ClCompile Include="BitmapSaveOptionDlg.cpp" />
     <ClCompile Include="SplitImageDlg.cpp" />
     <QtMoc Include="SplitImageDlg.h" />
     <QtMoc Include="BitmapSaveOptionDlg.h" />
     <QtMoc Include="AboutDlg.h" />
-    <QtMoc Include="QTreeViewEx.h" />
     <QtMoc Include="App.h" />
     <ClInclude Include="BitmapSaveOption.h" />
     <QtMoc Include="FindDuplicatesDlg.h" />

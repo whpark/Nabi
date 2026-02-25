@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "QTreeViewEx.h"
 #include "ui_MainWnd.h"
 #include "BitmapSaveOption.h"
 #include "BlendTestDlg.h"
@@ -14,6 +13,7 @@ public:
 	using base_t = QMainWindow;
 
 protected:
+	QFileSystemModel m_modelFolderSystem;
 	QFileSystemModel m_modelFileSystem;
 	cv::Mat m_img;
 	sBitmapSaveOption m_optionBitmap;
@@ -37,6 +37,8 @@ public:
 	bool ShowImage(std::filesystem::path const& path);
 protected:
 	bool SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option);
+	bool ConvertsCurrentImageTo(std::string const& ext);
+	cv::Mat FFT(cv::Mat const& m, bool bLogScale);
 
 protected:	// drag & drop
 	void dragEnterEvent(QDragEnterEvent* event) override;
@@ -50,7 +52,7 @@ public:
 protected:
 	// slots
 	//void OnFolder_Activated(const QModelIndex &index);
-	void OnFolder_SelChanged();
+	void OnFile_SelChanged();
 	void OnImage_Load();
 	void OnImage_Save();
 	void OnImage_Split();
@@ -59,6 +61,8 @@ protected:
 	void OnImage_Rotate180();
 	void OnImage_FlipLR();
 	void OnImage_FlipUD();
+
+	void OnImage_FFT(bool bLogScale);
 
 	void OnImage_Test();
 

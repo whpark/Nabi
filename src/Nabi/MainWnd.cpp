@@ -39,31 +39,48 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 
 	// Window Position
 	LoadWindowPosition(m_reg, "MainWnd", this);
-	if (auto r = m_reg.value("WindowPositions/splitter"); !r.isNull()) {
-		ui.splitter->restoreState(r.toByteArray());
+	if (auto r = m_reg.value("WindowPositions/splitterMain"); !r.isNull()) {
+		ui.splitterMain->restoreState(r.toByteArray());
 	}
-	if (auto* left = ui.splitter->widget(0)) {
+	if (auto* left = ui.splitterMain->widget(0)) {
 		left->setMaximumWidth(800);
 	}
 
 	// Folder View
-	ui.folder->setModel(&m_modelFileSystem);
+	m_modelFolderSystem.setFilter(QDir::NoDotAndDotDot | QDir::System | QDir::Dirs | QDir::Drives);
+	m_modelFileSystem.setFilter(QDir::NoDotAndDotDot | QDir::System | QDir::Files);
+	ui.folder->setModel(&m_modelFolderSystem);
+	m_modelFolderSystem.setRootPath("");
 	m_modelFileSystem.setRootPath("");
-	ui.folder->setRootIndex(m_modelFileSystem.index(""));
+	ui.folder->setRootIndex(m_modelFolderSystem.index(""));
+	ui.folder->setColumnWidth(0, 300);
+	ui.folder->hideColumn(1);
+	ui.folder->hideColumn(2);
+	ui.folder->hideColumn(3);
+	ui.files->setModel(&m_modelFileSystem);
+	ui.files->setColumnWidth(0, 300);
+
 	auto strPath = m_reg.value(L"misc/LastImage").toString();
 	if (!strPath.isEmpty()) {
 		auto index = m_modelFileSystem.index(strPath).parent();
 		std::filesystem::path path = ToWString(strPath);
-		if (std::filesystem::is_directory(path))
-			theApp->m_folderCurrent = theApp->m_folderCurrent;
+		bool bFolder = std::filesystem::is_directory(path);
+		if (bFolder)
+			theApp->m_folderCurrent = path;
 		else
 			theApp->m_folderCurrent = path.parent_path();
 
-		ui.folder->setCurrentIndex(index);
-		ui.folder->expand(index);
+		if (auto indexFolder = m_modelFolderSystem.index(ToQString(theApp->m_folderCurrent)); indexFolder.isValid())
+			ui.folder->setCurrentIndex(indexFolder);
+		if (auto idxRoot = m_modelFileSystem.setRootPath(ToQString(theApp->m_folderCurrent)); idxRoot.isValid())
+			ui.files->setRootIndex(idxRoot);
+		if (!bFolder) {
+			if (auto idx = m_modelFileSystem.index(strPath); idx.isValid()) {
+				ui.files->setCurrentIndex(idx);
+				OnFile_SelChanged();
+			}
+		}
 	}
-	ui.folder->setColumnWidth(0, 300);
-
 	//// Image View
 	////bool(bool bStore, std::string_view cookie, S_OPTION&);
 	//{
@@ -101,7 +118,15 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 
 	// Connection
 	connect(ui.btnAbout, &QPushButton::clicked, this, [this](auto) { xAboutDlg dlg(this); dlg.exec(); });
-	connect(ui.folder, &QTreeViewEx::selChanged, this, &this_t::OnFolder_SelChanged);
+	connect(ui.folder->selectionModel(), &QItemSelectionModel::currentChanged, this,
+		[this](auto const& current, auto const& prev) {
+			std::filesystem::path path = ToWString(m_modelFolderSystem.filePath(current));
+			theApp->m_folderCurrent = path;
+			auto index = m_modelFileSystem.setRootPath(ToQString(path));
+			ui.files->setRootIndex(index);
+		}
+	);
+	connect(ui.files->selectionModel(), &QItemSelectionModel::currentChanged, this, &this_t::OnFile_SelChanged);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnImage_Load);
 	connect(ui.btnLoad, &QPushButton::clicked, this, &this_t::OnImage_Load);
 	connect(ui.btnSave, &QPushButton::clicked, this, &this_t::OnImage_Save);
@@ -118,11 +143,24 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 	connect(ui.btnFindDuplicates, &QPushButton::clicked, this, &this_t::OnBtnFindDuplicates_Clicked);
 
 	connect(ui.btnPixelCount, &QPushButton::clicked, this, &this_t::OnBtnPixelCount_Clicked);
+
+	ui.btnCvt->addAction("toPNG", this, [this](auto) { ConvertsCurrentImageTo(".png"); });
+	ui.btnCvt->addAction("toBMP", this, [this](auto) { ConvertsCurrentImageTo(".bmp"); });
+	ui.btnCvt->addAction("toJPG", this, [this](auto) { ConvertsCurrentImageTo(".jpg"); });
+
+	connect(ui.btnOpenShell, &QPushButton::clicked, this, [this](auto) {
+		if (auto path = m_modelFolderSystem.filePath(ui.folder->currentIndex());
+			!path.isEmpty())
+		QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+	});
+
+	ui.btnFFT->addAction("FFT", this, [this](auto) { OnImage_FFT(false); });
+	ui.btnFFT->addAction("FFT(LogScale)", this, [this](auto) { OnImage_FFT(true); });
 }
 
 xMainWnd::~xMainWnd() {
-	if (auto r = ui.splitter->saveState(); r.size()) {
-		m_reg.setValue("WindowPositions/splitter", r);
+	if (auto r = ui.splitterMain->saveState(); r.size()) {
+		m_reg.setValue("WindowPositions/splitterMain", r);
 	}
 	SaveWindowPosition(m_reg, "MainWnd", this);
 }
@@ -281,7 +319,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 		}
 	}
 
-#ifdef _DEBUG 
+#ifdef _DEBUG
 	if constexpr (false) {
 		auto t1 = std::chrono::steady_clock::now();
 		auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
@@ -294,7 +332,8 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	m_reg.setValue(L"misc/LastImage", ToQString(path));
 	m_img = img;
 	m_optionBitmap = optionBitmap.value_or(sBitmapSaveOption{});	// set or reset
-	ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
+	//ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
+	ui.view->SetImage(img, false);
 	ui.edtPath->setText(ToQString(path));
 
 	auto info = std::format("Size({}, {})", img.cols, img.rows);
@@ -350,6 +389,74 @@ bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitma
 	return true;
 }
 
+bool xMainWnd::ConvertsCurrentImageTo(std::string const& ext) {
+	auto index = ui.files->currentIndex();
+	if (!index.isValid())
+		return false;
+	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
+	if (!exists(path))
+		return false;
+	cv::Mat img = m_img;
+	//path += ext;
+	path.replace_extension(ext);
+	std::vector<uchar> buf;
+	std::vector<int> params{cv::IMWRITE_JPEG_QUALITY, 95};
+	if (!cv::imencode(ext, m_img, buf, params))
+		return false;
+	return gtl::ContainerToFile(buf, path);
+}
+
+cv::Mat xMainWnd::FFT(cv::Mat const& m, bool bLogScale) {
+	// Expand the image to an optimal size for DFT performance (powers of 2, 3, and 5 are efficient)
+	int rows = cv::getOptimalDFTSize(m.rows);
+	int cols = cv::getOptimalDFTSize(m.cols);
+	cv::Mat padded;
+	cv::copyMakeBorder(m, padded, 0, rows - m.rows, 0, cols - m.cols, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+
+	// Prepare the complex matrix (real and imaginary parts)
+	cv::Mat planes[] = {cv::Mat_<float>(padded), cv::Mat::zeros(padded.size(), CV_32F)};
+	cv::Mat complexI;
+	cv::merge(planes, 2, complexI);
+
+	// Compute the 2D DFT
+	cv::dft(complexI, complexI, cv::DFT_COMPLEX_OUTPUT);
+
+	// Compute the magnitude spectrum
+	cv::split(complexI, planes); // planes[0] = Re(DFT(m)), planes[1] = Im(DFT(m))
+	cv::magnitude(planes[0], planes[1], planes[0]);
+	cv::Mat magI = planes[0];
+
+	// Shift the zero-frequency component to the center of the spectrum
+	// (for visualization purposes, as the origin is at the top-left by default)
+	int cx = magI.cols / 2;
+	int cy = magI.rows / 2;
+	cv::Mat q0(magI, cv::Rect(0, 0, cx, cy));   // Top-Left
+	cv::Mat q1(magI, cv::Rect(cx, 0, cx, cy));  // Top-Right
+	cv::Mat q2(magI, cv::Rect(0, cy, cx, cy));  // Bottom-Left
+	cv::Mat q3(magI, cv::Rect(cx, cy, cx, cy)); // Bottom-Right
+
+	cv::Mat tmp;
+	q0.copyTo(tmp);
+	q3.copyTo(q0);
+	tmp.copyTo(q3);
+	q1.copyTo(tmp);
+	q2.copyTo(q1);
+	tmp.copyTo(q2);
+
+	// Transform the magnitude to a logarithmic scale for better visualization
+	// (high and low frequencies can vary significantly)
+	if (bLogScale) {
+		magI += cv::Scalar::all(1); // switch to logarithmic scale
+		cv::log(magI, magI);
+	}
+	// Normalize the spectrum for display (values between 0 and 1)
+	auto org = std::exchange(magI.at<float>(cy, cx), 0.0f);	// DC component (zero-frequency) is set to zero for better visualization
+	cv::normalize(magI, magI, 0, 1, cv::NORM_MINMAX);
+	magI.at<float>(cy, cx) = 1.0;	// restore DC component
+	magI.convertTo(magI, CV_8UC1, 255);
+	return magI;
+}
+
 void xMainWnd::dragEnterEvent(QDragEnterEvent* event) {
 	if (event->mimeData()->hasUrls())
 		event->acceptProposedAction();
@@ -378,28 +485,35 @@ void xMainWnd::dropEvent(QDropEvent* event) {
 	OnImage_Load();
 }
 
-void xMainWnd::OnFolder_SelChanged() {
-	auto index = ui.folder->currentIndex();
+void xMainWnd::OnFile_SelChanged() {
+	auto index = ui.files->currentIndex();
 	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
 	if (path.empty())
 		return;
+	if (!path.is_absolute()) {
+		auto indexFolder = ui.folder->currentIndex();
+		if (!indexFolder.isValid())
+			return;
+		std::filesystem::path pathFolder = m_modelFolderSystem.filePath(indexFolder).toStdWString();
+		path = pathFolder / path;
+	}
 
-	if (std::filesystem::is_directory(path)) {
-		theApp->m_folderCurrent = path;
-	}
-	else {
-		theApp->m_folderCurrent = path.parent_path();
-		if (!ShowImage(path))
-			ui.view->SetImage({});
-	}
+	if (!ShowImage(path))
+		ui.view->SetImage({});
 }
 
 void xMainWnd::OnImage_Load() {
 	std::filesystem::path path = ui.edtPath->text().toStdWString();
 	if (path.empty())
 		return;
-	if (auto index = m_modelFileSystem.index(ToQString(path)); index.isValid())
+	auto parent = path.parent_path();
+	if (parent.empty())
+		return;
+	if (auto index = m_modelFolderSystem.index(ToQString(parent)); index.isValid())
 		ui.folder->setCurrentIndex(index);
+	if (auto index = m_modelFileSystem.index(ToQString(path)); index.isValid()) {
+		ui.files->setCurrentIndex(index);
+	}
 	else {
 		if (!ShowImage(path))
 			ui.view->SetImage({});
@@ -412,12 +526,12 @@ void xMainWnd::OnImage_Save() {
 
 	QString strFolder;
 	if (auto index = ui.folder->currentIndex(); index.isValid()) {
-		strFolder = m_modelFileSystem.filePath(index);
-		std::filesystem::path path = strFolder.toStdString();
-		if (std::filesystem::is_regular_file(path)) {
-			path = path.parent_path();
-			strFolder = ToQString(path.wstring());
-		}
+		strFolder = m_modelFolderSystem.filePath(index);
+		std::filesystem::path path = strFolder.toStdWString();
+		//if (std::filesystem::is_regular_file(path)) {
+		//	path = path.parent_path();
+		//	strFolder = ToQString(path.wstring());
+		//}
 	}
 	QString strPath = QFileDialog::getSaveFileName(this, "Save Image", strFolder, "Image Files (*.bmp *.jpg *.jpeg *.png *.tif *.tiff);;All Files(*.*)");
 	std::filesystem::path path = ToWString(strPath);
@@ -567,6 +681,33 @@ void xMainWnd::OnImage_FlipUD() {
 	xWaitCursor wc;
 	cv::flip(m_img, m_img, 0);
 	ui.view->SetImage(m_img, false);
+}
+
+void xMainWnd::OnImage_FFT(bool bLogScale) {
+	auto index = ui.files->currentIndex();
+	if (!index.isValid())
+		return;
+	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
+	if (path.empty())
+		return;
+	path += L"_ft.png";
+	cv::Mat m;
+	if (m_img.channels() == 3)
+		cv::cvtColor(m_img, m, cv::COLOR_BGR2GRAY);
+	else if (m_img.channels() == 4)
+		cv::cvtColor(m_img, m, cv::COLOR_BGRA2GRAY);
+	else
+		m = m_img;
+	if (m.empty() or m.channels() != 1)
+		return;
+	auto mFT = FFT(m, bLogScale);
+	if (mFT.empty())
+		return;
+	std::vector<uchar> buf;
+	cv::imencode(".png", mFT, buf);
+	if (buf.empty())
+		return;
+	gtl::ContainerToFile(buf, path);
 }
 
 void xMainWnd::OnImage_Test() {
