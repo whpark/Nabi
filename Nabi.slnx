@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/gtl/">
+    <Project Path="gtl/src/gtl/gtl.vcxproj" Id="0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0" />
+    <Project Path="gtl/src/qt/qt.vcxproj" Id="e963dd40-a001-4874-9def-3c7646abaecc" />
+    <Project Path="gtl/src/shape/shape.vcxproj" Id="fba95adb-13a2-4139-ba8e-789bfe9aa1ae" />
+    <Project Path="gtl/src/win/win.vcxproj" Id="a7a07211-7966-4626-9dc3-02f8cc2a9042" />
+  </Folder>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="setup/setup.vdproj" Type="Installer">
+    <Build Solution="Release|*" />
+  </Project>
+  <Project Path="src/Nabi/Nabi.vcxproj" Id="3a21ccad-0814-4ec7-b6ba-1178a8c267c0" />
+</Solution>
