@@ -202,7 +202,7 @@ bool xBlendTestDlg::SaveImage(cv::Mat img, std::filesystem::path const& path, sO
 	int nBPP = sBitmapSaveOption::GetBPP(o.bpp);
 	auto palette = GetPalette(nBPP, o.bColorImage);
 	gtl::xSize2i pelsPerMeter{ o.pelsPerMeterX, o.pelsPerMeterY };
-	return gtl::SaveBitmapMat(path, img, nBPP, pelsPerMeter, palette, true, false);
+	return gtl::SaveBitmapMat(path, img, nBPP, pelsPerMeter, palette);
 }
 
 std::filesystem::path xBlendTestDlg::GetImagePath(sOption const& o) {

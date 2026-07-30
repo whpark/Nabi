@@ -4,7 +4,7 @@
 template < int nBPP >
 std::vector<gtl::color_bgra_t> GetGrayScalePalette() {
 	constexpr size_t s = 1 << nBPP;
-	static_assert (gtl::IsValueOneOf(s, 2, 16, 256));
+	static_assert (gtl::IsValueAnyOf(s, 2, 16, 256));
 
 	std::vector<gtl::color_bgra_t> p(s);
 	for (int i = 0; i < p.size(); i++) {
