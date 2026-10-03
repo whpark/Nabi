@@ -5,6 +5,7 @@
 #include "BlendTestDlg.h"
 #include "FindDuplicatesDlg.h"
 #include "gtl/qt/QPathCompleter.h"
+#include "gtl/qt/QArchiveFileSystemModel.h"
 
 class xMainWnd : public QMainWindow {
 	Q_OBJECT
@@ -13,8 +14,8 @@ public:
 	using base_t = QMainWindow;
 
 protected:
-	QFileSystemModel m_modelFolderSystem;
-	QFileSystemModel m_modelFileSystem;
+	gtl::qt::QArchiveFileSystemModel m_modelFolderSystem;
+	gtl::qt::QArchiveFileSystemModel m_modelFileSystem;
 	cv::Mat m_img;
 	sBitmapSaveOption m_optionBitmap;
 
@@ -34,8 +35,16 @@ public:
 	~xMainWnd();
 
 public:
+	/// @brief path : real path or path in archive ("D:/a.zip/sub/img.png")
 	bool ShowImage(std::filesystem::path const& path);
 protected:
+	bool LoadImageFile(std::filesystem::path const& path, cv::Mat& img, std::optional<sBitmapSaveOption>& optionBitmap);
+	bool LoadImageInArchive(std::filesystem::path const& pathArchive, std::filesystem::path const& pathEntry, cv::Mat& img, std::optional<sBitmapSaveOption>& optionBitmap);
+	/// @brief folder : real folder or folder in archive (including archive itself)
+	void SetFilesRoot(QString const& folder);
+	/// @brief path in archive -> (archive's folder)/(file name). others : as it is.
+	static std::filesystem::path ToWritablePath(std::filesystem::path const& path);
+
 	bool SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option);
 	bool ConvertsCurrentImageTo(std::string const& ext);
 	cv::Mat FFT(cv::Mat const& m, bool bLogScale);

@@ -9,6 +9,9 @@
 
 #include "FreeImage.h"
 
+#include <future>
+#include <spanstream>
+
 using namespace gtl::qt;
 
 xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
@@ -46,8 +49,10 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 		left->setMaximumWidth(800);
 	}
 
-	// Folder View
-	m_modelFolderSystem.setFilter(QDir::NoDotAndDotDot | QDir::System | QDir::Dirs | QDir::Drives);
+	// Folder View (+ archive files as folders. AllDirs : name filters are not applied to folders)
+	m_modelFolderSystem.setFilter(QDir::NoDotAndDotDot | QDir::System | QDir::AllDirs | QDir::Drives | QDir::Files);
+	m_modelFolderSystem.setNameFilters({"*.zip", "*.7z"});
+	m_modelFolderSystem.setNameFilterDisables(false);
 	m_modelFileSystem.setFilter(QDir::NoDotAndDotDot | QDir::System | QDir::Files);
 	ui.folder->setModel(&m_modelFolderSystem);
 	m_modelFolderSystem.setRootPath("");
@@ -59,21 +64,20 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 	ui.folder->hideColumn(3);
 	ui.files->setModel(&m_modelFileSystem);
 	ui.files->setColumnWidth(0, 300);
+	ui.files->setRootIsDecorated(false);	// file list. archive files are not expanded here (browse them in ui.folder)
+	ui.files->setItemsExpandable(false);
 
 	auto strPath = m_reg.value(L"misc/LastImage").toString();
 	if (!strPath.isEmpty()) {
-		auto index = m_modelFileSystem.index(strPath).parent();
 		std::filesystem::path path = ToWString(strPath);
 		bool bFolder = std::filesystem::is_directory(path);
-		if (bFolder)
-			theApp->m_folderCurrent = path;
-		else
-			theApp->m_folderCurrent = path.parent_path();
+		auto strFolder = ToQString(bFolder ? path : path.parent_path());	// may be a folder in archive
 
-		if (auto indexFolder = m_modelFolderSystem.index(ToQString(theApp->m_folderCurrent)); indexFolder.isValid())
+		if (auto indexFolder = m_modelFolderSystem.index(strFolder); indexFolder.isValid()) {
 			ui.folder->setCurrentIndex(indexFolder);
-		if (auto idxRoot = m_modelFileSystem.setRootPath(ToQString(theApp->m_folderCurrent)); idxRoot.isValid())
-			ui.files->setRootIndex(idxRoot);
+			ui.folder->scrollTo(indexFolder);
+		}
+		SetFilesRoot(strFolder);
 		if (!bFolder) {
 			if (auto idx = m_modelFileSystem.index(strPath); idx.isValid()) {
 				ui.files->setCurrentIndex(idx);
@@ -120,11 +124,15 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 	connect(ui.btnAbout, &QPushButton::clicked, this, [this](auto) { xAboutDlg dlg(this); dlg.exec(); });
 	connect(ui.folder->selectionModel(), &QItemSelectionModel::currentChanged, this,
 		[this](auto const& current, auto const& prev) {
-			std::filesystem::path path = ToWString(m_modelFolderSystem.filePath(current));
-			theApp->m_folderCurrent = path;
-			auto index = m_modelFileSystem.setRootPath(ToQString(path));
-			ui.files->setRootIndex(index);
+			if (m_modelFolderSystem.IsArchive(current))
+				m_modelFolderSystem.LoadArchive(current);	// reads folder structure on selection
+			SetFilesRoot(m_modelFolderSystem.filePath(current));
 		}
+	);
+	connect(&m_modelFileSystem, &gtl::qt::QArchiveFileSystemModel::archiveLoadFailed, this,
+		[this](QString const& path, QString const& message) {
+			QMessageBox::warning(this, "Archive", path + "\n\n" + message);
+		}, Qt::QueuedConnection	// may be emitted during view's layout (fetchMore)
 	);
 	connect(ui.files->selectionModel(), &QItemSelectionModel::currentChanged, this, &this_t::OnFile_SelChanged);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnImage_Load);
@@ -149,9 +157,12 @@ xMainWnd::xMainWnd(QWidget *parent) : base_t(parent), m_reg(theApp->GetReg()) {
 	ui.btnCvt->addAction("toJPG", this, [this](auto) { ConvertsCurrentImageTo(".jpg"); });
 
 	connect(ui.btnOpenShell, &QPushButton::clicked, this, [this](auto) {
-		if (auto path = m_modelFolderSystem.filePath(ui.folder->currentIndex());
-			!path.isEmpty())
-		QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+		auto index = ui.folder->currentIndex();
+		auto path = m_modelFolderSystem.filePath(index);
+		if (auto archive = m_modelFolderSystem.GetArchivePath(index))
+			path = ToQString(archive->first.parent_path());	// archive's folder
+		if (!path.isEmpty())
+			QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 	});
 
 	ui.btnFFT->addAction("FFT", this, [this](auto) { OnImage_FFT(false); });
@@ -165,7 +176,84 @@ xMainWnd::~xMainWnd() {
 	SaveWindowPosition(m_reg, "MainWnd", this);
 }
 
+/// @brief FIBITMAP -> cv::Mat, bitmap option
+static void FromFreeImage(FIBITMAP* fb, cv::Mat& img, std::optional<sBitmapSaveOption>& optionBitmap) {
+	img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
+	//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
+		optionBitmap.emplace();
+		auto& o = *optionBitmap;
+		o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
+		o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
+		o.bTopToBottom = false;
+	//}
+}
+
+/// @brief bitmap header -> bitmap option
+static gtl::BITMAP_HEADER FromBitmapHeader(gtl::variant_BITMAP_HEADER const& header, std::optional<sBitmapSaveOption>& optionBitmap) {
+	auto bh = std::visit([](auto const& arg) { return (gtl::BITMAP_HEADER const&)arg; }, header);
+	optionBitmap.emplace();
+	auto& o = *optionBitmap;
+	o.bpp = o.GetBPP(bh.nBPP);
+	o.dpi = o.GetDPI({bh.XPelsPerMeter, bh.YPelsPerMeter});
+	o.bTopToBottom = bh.height > 0;	// when bh.height is zero... assume bottom to top. default is bottom to top.
+	return bh;
+}
+
+/// @brief bitmap that gtl::LoadBitmapMat() handles better than cv::imdecode()
+static bool IsPixelArrayBitmap(gtl::BITMAP_HEADER const& bh) {
+	//auto w = bh.width;
+	//auto h = bh.height;
+	//if (w < 0) w = -w;
+	//if (h < 0) h = -h;
+	return (bh.nBPP <= 8) and (bh.compression == 0) and (bh.planes == 1) /* and ((uint64_t)w * h > 32767ull * 32767)*/;
+}
+
 bool xMainWnd::ShowImage(std::filesystem::path const& path) {
+	m_reg.setValue("misc/useFreeImage", ui.chkUseFreeImage->isChecked());
+
+	cv::Mat img;
+	std::optional<sBitmapSaveOption> optionBitmap;
+
+#ifdef _DEBUG
+	auto t0 = std::chrono::steady_clock::now();
+#endif
+
+	if (auto archive = gtl::SplitArchivePath(path); archive and !archive->second.empty()) {
+		if (!LoadImageInArchive(archive->first, archive->second, img, optionBitmap))
+			return false;
+	}
+	else {
+		if (!LoadImageFile(path, img, optionBitmap))
+			return false;
+	}
+
+#ifdef _DEBUG
+	if constexpr (false) {
+		auto t1 = std::chrono::steady_clock::now();
+		auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+		auto msg = std::format("Size({}, {}), LoadTime({}ms)", img.cols, img.rows, ts.count());
+		QMessageBox::information(this, "Info", ToQString(msg));
+	}
+#endif
+
+	auto str = ToQString(path);
+	m_reg.setValue(L"misc/LastImage", ToQString(path));
+	m_img = img;
+	m_optionBitmap = optionBitmap.value_or(sBitmapSaveOption{});	// set or reset
+	//ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
+	ui.view->SetImage(img, false);
+	ui.edtPath->setText(ToQString(path));
+
+	auto info = std::format("Size({}, {})", img.cols, img.rows);
+	if (optionBitmap) {
+		auto const& o = *optionBitmap;
+		info += std::format(" BPP({}), dpi({}, {})", o.GetBPP(o.bpp), o.dpi.cx, o.dpi.cy);
+	}
+	ui.edtImageInfo->setText(ToQString(info));
+	return true;
+}
+
+bool xMainWnd::LoadImageFile(std::filesystem::path const& path, cv::Mat& img, std::optional<sBitmapSaveOption>& optionBitmap) {
 	std::error_code ec;
 	if (!std::filesystem::is_regular_file(path, ec))
 		return false;
@@ -173,17 +261,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 	if (!sizeFile)
 		return false;
 
-	m_reg.setValue("misc/useFreeImage", ui.chkUseFreeImage->isChecked());
-
 	xWaitCursor wc;
-	cv::Mat img;
-
-	// test FreeImage
-	std::optional<sBitmapSaveOption> optionBitmap;
-
-#ifdef _DEBUG
-	auto t0 = std::chrono::steady_clock::now();
-#endif
 
 	// Use FreeImage
 	while (ui.chkUseFreeImage->isChecked()) {
@@ -235,14 +313,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 				dlg.m_message = L"Post Processing...";
 				gsl::final_action fa([&]{FreeImage_Unload(fb);});
 
-				img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
-				//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
-					optionBitmap.emplace();
-					auto& o = *optionBitmap;
-					o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
-					o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
-					o.bTopToBottom = false;
-				//}
+				FromFreeImage(fb, img, optionBitmap);
 
 				dlg.UpdateProgress(100, true, fb?false:true);
 			});
@@ -259,15 +330,7 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			auto* fb = FreeImage_LoadU(eFileType, path.c_str(), 0);
 			if (fb) {
 				gsl::final_action fa([&]{FreeImage_Unload(fb);});
-
-				img = gtl::ConvertFI2Mat(fb).value_or(cv::Mat{});
-				//if (FreeImage_GetImageType(fb) == FREE_IMAGE_TYPE::FIT_BITMAP) {
-					optionBitmap.emplace();
-					auto& o = *optionBitmap;
-					o.bpp = o.GetBPP(FreeImage_GetBPP(fb));
-					o.dpi = o.GetDPI({FreeImage_GetDotsPerMeterX(fb), FreeImage_GetDotsPerMeterY(fb)});
-					o.bTopToBottom = false;
-				//}
+				FromFreeImage(fb, img, optionBitmap);
 			}
 		}
 
@@ -280,17 +343,8 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 			if (img.empty()) {
 				auto [result, fileHeader, header] = gtl::LoadBitmapHeader(path);
 				if (result) {
-					auto bh = std::visit([](auto& arg) { return (gtl::BITMAP_HEADER&)arg; }, header);
-					optionBitmap.emplace();
-					auto& o = *optionBitmap;
-					o.bpp = o.GetBPP(bh.nBPP);
-					o.dpi = o.GetDPI({bh.XPelsPerMeter, bh.YPelsPerMeter});
-					o.bTopToBottom = bh.height > 0;	// when bh.height is zero... assume bottom to top. default is bottom to top.
-					//auto w = bh.width;
-					//auto h = bh.height;
-					//if (w < 0) w = -w;
-					//if (h < 0) h = -h;
-					if ((bh.nBPP <= 8) and (bh.compression == 0) and (bh.planes == 1) /* and ((uint64_t)w * h > 32767ull * 32767)*/) {
+					auto bh = FromBitmapHeader(header, optionBitmap);
+					if (IsPixelArrayBitmap(bh)) {
 						bLoadBitmapMatTRIED = true;
 						if (auto r = LoadBitmapMatProgress(path); !r.img.empty()) {
 							img = r.img;
@@ -319,30 +373,117 @@ bool xMainWnd::ShowImage(std::filesystem::path const& path) {
 		}
 	}
 
-#ifdef _DEBUG
-	if constexpr (false) {
-		auto t1 = std::chrono::steady_clock::now();
-		auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
-		auto msg = std::format("Size({}, {}), LoadTime({}ms)", img.cols, img.rows, ts.count());
-		QMessageBox::information(this, "Info", ToQString(msg));
-	}
-#endif
+	return !img.empty();
+}
 
-	auto str = ToQString(path);
-	m_reg.setValue(L"misc/LastImage", ToQString(path));
-	m_img = img;
-	m_optionBitmap = optionBitmap.value_or(sBitmapSaveOption{});	// set or reset
-	//ui.view->SetImage(img, true, xMatView::eZOOM::fit2window);
-	ui.view->SetImage(img, false);
-	ui.edtPath->setText(ToQString(path));
+bool xMainWnd::LoadImageInArchive(std::filesystem::path const& pathArchive, std::filesystem::path const& pathEntry, cv::Mat& img, std::optional<sBitmapSaveOption>& optionBitmap) {
+	if (!gtl::IsImageExtension(pathEntry) and (FreeImage_GetFIFFromFilename(pathEntry.extension().string().c_str()) == FIF_UNKNOWN))
+		return false;
 
-	auto info = std::format("Size({}, {})", img.cols, img.rows);
-	if (optionBitmap) {
-		auto const& o = *optionBitmap;
-		info += std::format(" BPP({}), dpi({}, {})", o.GetBPP(o.bpp), o.dpi.cx, o.dpi.cy);
+	// extract. progress dialog only if it takes a while (solid 7z, big file)
+	std::vector<uint8_t> buf;
+	{
+		std::atomic<int> iPercent{};
+		std::atomic<bool> bCancel{};
+		auto future = std::async(std::launch::async, [&]() {
+			return gtl::ReadArchiveEntry(pathArchive, pathEntry, [&](uint64_t read, uint64_t total) {
+				iPercent = total ? (int)(read * 100 / total) : 0;
+				return !bCancel;
+			});
+		});
+		if (future.wait_for(300ms) != std::future_status::ready) {
+			gtl::qt::xProgressDlg dlg(this);
+			dlg.m_message = std::format(L"Extracting : {}", pathEntry.wstring());
+			dlg.m_rThreadWorker = std::make_unique<std::jthread>([&]() {
+				while (future.wait_for(50ms) != std::future_status::ready) {
+					if (!dlg.UpdateProgress(iPercent, false, false))
+						bCancel = true;
+				}
+				dlg.UpdateProgress(100, true, false);
+			});
+			if (dlg.exec() != QDialog::Accepted)
+				bCancel = true;
+			xWaitCursor wc;
+			dlg.m_rThreadWorker->join();
+		}
+		auto r = future.get();
+		if (bCancel)
+			return false;
+		if (!r) {
+			QMessageBox::warning(this, "Archive", ToQString(std::format(L"{}\n{}\n\n", pathArchive.wstring(), pathEntry.wstring())) + ToQString(r.error()));
+			return false;
+		}
+		buf = std::move(*r);
 	}
-	ui.edtImageInfo->setText(ToQString(info));
-	return true;
+	if (buf.empty())
+		return false;
+
+	xWaitCursor wc;
+	auto const ext = pathEntry.extension().string();
+
+	// FreeImage
+	if (ui.chkUseFreeImage->isChecked()) {
+		if (auto eFileType = FreeImage_GetFIFFromFilename(ext.c_str()); eFileType != FIF_UNKNOWN and buf.size() <= std::numeric_limits<DWORD>::max()) {
+			if (auto* mem = FreeImage_OpenMemory(buf.data(), (DWORD)buf.size())) {
+				gsl::final_action faMem([&]{FreeImage_CloseMemory(mem);});
+				if (auto* fb = FreeImage_LoadFromMemory(eFileType, mem, 0)) {
+					gsl::final_action fa([&]{FreeImage_Unload(fb);});
+					FromFreeImage(fb, img, optionBitmap);
+				}
+			}
+		}
+	}
+
+	if (img.empty()) {
+		bool const bBitmap = gtl::tszicmp<char>(ext, ".bmp"sv) == 0;
+		bool bLoadBitmapMatTRIED{};
+		auto LoadBitmapMatFromBuffer = [&] {
+			bLoadBitmapMatTRIED = true;
+			std::ispanstream is(std::span<char>((char*)buf.data(), buf.size()));
+			if (auto r = gtl::LoadBitmapMat(is); !r.img.empty())
+				img = r.img;
+		};
+		if (bBitmap) {
+			std::ispanstream is(std::span<char>((char*)buf.data(), buf.size()));
+			if (auto [result, fileHeader, header] = gtl::LoadBitmapHeader(is); result) {
+				if (IsPixelArrayBitmap(FromBitmapHeader(header, optionBitmap)))
+					LoadBitmapMatFromBuffer();
+			}
+		}
+		if (img.empty() and gtl::IsImageExtension(pathEntry)) {
+			try {
+				img = cv::imdecode(buf, cv::ImreadModes::IMREAD_ANYCOLOR);
+			} catch (...) {}
+		}
+		if (img.empty() and bBitmap and !bLoadBitmapMatTRIED)
+			LoadBitmapMatFromBuffer();
+		if (img.empty())
+			return false;
+		if (img.channels() == 3) {
+			cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGR2RGB);
+		}
+		else if (img.channels() == 4) {
+			cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGRA2RGBA);
+		}
+	}
+
+	return !img.empty();
+}
+
+void xMainWnd::SetFilesRoot(QString const& folder) {
+	std::filesystem::path path = ToWString(folder);
+	if (auto archive = gtl::SplitArchivePath(path))
+		theApp->m_folderCurrent = archive->first.parent_path();	// real folder for writing
+	else
+		theApp->m_folderCurrent = path;
+	auto index = m_modelFileSystem.setRootPath(folder);
+	ui.files->setRootIndex(index);
+}
+
+std::filesystem::path xMainWnd::ToWritablePath(std::filesystem::path const& path) {
+	if (auto archive = gtl::SplitArchivePath(path); archive and !archive->second.empty())
+		return archive->first.parent_path() / archive->second.filename();
+	return path;
 }
 
 bool xMainWnd::SaveImage(cv::Mat img0, std::filesystem::path const& path, sBitmapSaveOption const& option) {
@@ -394,8 +535,9 @@ bool xMainWnd::ConvertsCurrentImageTo(std::string const& ext) {
 	if (!index.isValid())
 		return false;
 	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
-	if (!exists(path))
+	if (!m_modelFileSystem.IsVirtual(index) and !exists(path))
 		return false;
+	path = ToWritablePath(path);	// archive is read only
 	cv::Mat img = m_img;
 	//path += ext;
 	path.replace_extension(ext);
@@ -509,8 +651,10 @@ void xMainWnd::OnImage_Load() {
 	auto parent = path.parent_path();
 	if (parent.empty())
 		return;
-	if (auto index = m_modelFolderSystem.index(ToQString(parent)); index.isValid())
+	if (auto index = m_modelFolderSystem.index(ToQString(parent)); index.isValid()) {
 		ui.folder->setCurrentIndex(index);
+		ui.folder->scrollTo(index);	// expands parents (ex, archive)
+	}
 	if (auto index = m_modelFileSystem.index(ToQString(path)); index.isValid()) {
 		ui.files->setCurrentIndex(index);
 	}
@@ -527,6 +671,8 @@ void xMainWnd::OnImage_Save() {
 	QString strFolder;
 	if (auto index = ui.folder->currentIndex(); index.isValid()) {
 		strFolder = m_modelFolderSystem.filePath(index);
+		if (m_modelFolderSystem.GetArchivePath(index))
+			strFolder = ToQString(theApp->m_folderCurrent);	// archive's folder
 		std::filesystem::path path = strFolder.toStdWString();
 		//if (std::filesystem::is_regular_file(path)) {
 		//	path = path.parent_path();
@@ -559,7 +705,7 @@ void xMainWnd::OnImage_Split() {
 
 	xSplitImageDlg dlg(m_img, this);
 	dlg.m_option = m_optionBitmap;
-	dlg.m_path = ToWString(ui.edtPath->text());
+	dlg.m_path = ToWritablePath(ToWString(ui.edtPath->text()));
 	dlg.UpdateData(false);
 	if (auto r = dlg.exec(); r != QDialog::Accepted)
 		return;
@@ -690,6 +836,7 @@ void xMainWnd::OnImage_FFT(bool bLogScale) {
 	std::filesystem::path path = m_modelFileSystem.filePath(index).toStdWString();
 	if (path.empty())
 		return;
+	path = ToWritablePath(path);	// archive is read only
 	path += L"_ft.png";
 	cv::Mat m;
 	if (m_img.channels() == 3)
